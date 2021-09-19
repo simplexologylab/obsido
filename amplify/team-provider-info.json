@@ -1,0 +1,23 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-obsido-dev-75210-authRole",
+      "UnauthRoleArn": "arn:aws:iam::036010841399:role/amplify-obsido-dev-75210-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::036010841399:role/amplify-obsido-dev-75210-authRole",
+      "Region": "us-east-2",
+      "DeploymentBucketName": "amplify-obsido-dev-75210-deployment",
+      "UnauthRoleName": "amplify-obsido-dev-75210-unauthRole",
+      "StackName": "amplify-obsido-dev-75210",
+      "StackId": "arn:aws:cloudformation:us-east-2:036010841399:stack/amplify-obsido-dev-75210/0c242720-1940-11ec-976f-0a05d1ef2266",
+      "AmplifyAppId": "d2ktaik52bgzob"
+    },
+    "categories": {
+      "function": {
+        "addStock": {
+          "deploymentBucketName": "amplify-obsido-dev-75210-deployment",
+          "s3Key": "amplify-builds/addStock-34595168583756363552-build.zip"
+        }
+      }
+    }
+  }
+}

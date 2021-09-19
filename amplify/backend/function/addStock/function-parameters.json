@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "api": {
+      "obsido": [
+        "Query",
+        "Mutation",
+        "Subscription"
+      ]
+    }
+  },
+  "lambdaLayers": []
+}

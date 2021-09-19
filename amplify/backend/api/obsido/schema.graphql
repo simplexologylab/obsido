@@ -1,0 +1,15 @@
+type Stock @model {
+  id: ID!
+  description: String
+  ticker: String!
+  eps: String
+}
+
+type Query {
+  hello: String! @function(name: "hello-${env}")
+  getDetail(ticker: String): String! @function(name: "getDetail-${env}")
+}
+
+type Mutation {
+  addStock(ticker: String): Stock! @function(name: "addStock-${env}")
+}
