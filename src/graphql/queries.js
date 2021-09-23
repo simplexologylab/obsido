@@ -29,6 +29,16 @@ export const getStock = /* GraphQL */ `
         dma50
         dma200
       }
+      quote {
+        open
+        high
+        low
+        price
+        volume
+        prevClose
+        change
+        changePercent
+      }
       createdAt
       updatedAt
     }
@@ -56,6 +66,16 @@ export const listStocks = /* GraphQL */ `
           last52Low
           dma50
           dma200
+        }
+        quote {
+          open
+          high
+          low
+          price
+          volume
+          prevClose
+          change
+          changePercent
         }
         createdAt
         updatedAt

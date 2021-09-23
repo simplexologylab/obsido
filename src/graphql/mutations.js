@@ -19,6 +19,16 @@ export const addStock = /* GraphQL */ `
         dma50
         dma200
       }
+      quote {
+        open
+        high
+        low
+        price
+        volume
+        prevClose
+        change
+        changePercent
+      }
       createdAt
       updatedAt
     }
@@ -44,6 +54,16 @@ export const createStock = /* GraphQL */ `
         last52Low
         dma50
         dma200
+      }
+      quote {
+        open
+        high
+        low
+        price
+        volume
+        prevClose
+        change
+        changePercent
       }
       createdAt
       updatedAt
@@ -71,6 +91,16 @@ export const updateStock = /* GraphQL */ `
         dma50
         dma200
       }
+      quote {
+        open
+        high
+        low
+        price
+        volume
+        prevClose
+        change
+        changePercent
+      }
       createdAt
       updatedAt
     }
@@ -96,6 +126,16 @@ export const deleteStock = /* GraphQL */ `
         last52Low
         dma50
         dma200
+      }
+      quote {
+        open
+        high
+        low
+        price
+        volume
+        prevClose
+        change
+        changePercent
       }
       createdAt
       updatedAt

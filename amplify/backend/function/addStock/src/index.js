@@ -29,6 +29,16 @@ const createStock = gql`
         dma50
         dma200
       }
+      quote {
+        open
+        high
+        low
+        price
+        volume
+        prevClose
+        change
+        changePercent
+      }
       createdAt
       updatedAt
     }
@@ -46,6 +56,16 @@ const listStocks = gql`
   }
 `;
 
+function removeSpaceFromApiKeys(apiKeyValue) {
+  return Object.entries(apiKeyValue)
+    .map(([key, value]) => [key.replace(/\s+/g, ""), value])
+    .reduce((result, [normalizedKey, value]) => {
+      result[normalizedKey] =
+        value && typeof value === "object" ? removeSpaceFromApiKeys(value) : value;
+      return result;
+    }, {});
+}
+
 exports.handler = async (event) => {
   try {
     const stockData = await axios({
@@ -53,7 +73,11 @@ exports.handler = async (event) => {
       url: `https://www.alphavantage.co/query?function=OVERVIEW&symbol=${event.arguments.ticker}&apikey=6GUGOE51J9KLH0O2`,
     });
 
-    console.log("hello")
+    const quoteData = await axios({
+      method: "get",
+      url: `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${event.arguments.ticker}&apikey=6GUGOE51J9KLH0O2`,
+    });
+
     const current = await axios({
       url: process.env.API_OBSIDO_GRAPHQLAPIENDPOINTOUTPUT,
       method: "post",
@@ -71,6 +95,8 @@ exports.handler = async (event) => {
       ) === -1
     ) {
       // Then we need to add this stock
+      const formattedQuoteData = removeSpaceFromApiKeys(quoteData.data)
+
       const create = await axios({
         url: process.env.API_OBSIDO_GRAPHQLAPIENDPOINTOUTPUT,
         method: "post",
@@ -94,6 +120,16 @@ exports.handler = async (event) => {
                 last52Low: stockData.data["52WeekLow"],
                 dma50: stockData.data["50DayMovingAverage"],
                 dma200: stockData.data["200DayMovingAverage"],
+              },
+              quote: {
+                open: formattedQuoteData.GlobalQuote["02.open"],
+                high: formattedQuoteData.GlobalQuote["03.high"],
+                low: formattedQuoteData.GlobalQuote["04.low"],
+                price: formattedQuoteData.GlobalQuote["05.price"],
+                volume: formattedQuoteData.GlobalQuote["06.volume"],
+                prevClose: formattedQuoteData.GlobalQuote["08.previousclose"],
+                change: formattedQuoteData.GlobalQuote["09.change"],
+                changePercent: formattedQuoteData.GlobalQuote["10.changepercent"],
               },
             },
           },

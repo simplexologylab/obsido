@@ -46,7 +46,7 @@ export default function Home() {
       const { data } = await API.graphql(graphqlOperation(listStocks));
       setStocks(data.listStocks.items);
     } catch (err) {
-      setErrors([...errors, "Issue with API call to get list of stocks"])
+      setErrors([...errors, "Issue with API call to get list of stocks"]);
     }
   }
 
@@ -99,7 +99,9 @@ export default function Home() {
 
       <main className="flex flex-col justify-center">
         <div className="flex flex-row bg-black content-center">
-          <h2 className="flex-auto p-4 text-white text-2xl text-center">Obsido</h2>
+          <h2 className="flex-auto p-4 text-white text-2xl text-center">
+            Obsido
+          </h2>
           <button
             className="w-sm border-2 m-4 p-2 bg-green-600 text-white border-2 border-gray"
             onClick={() => setShowAdd(!showAdd)}
@@ -146,7 +148,9 @@ export default function Home() {
               key={stock.id}
             >
               <h3 className="text-xl text-center">{stock.ticker}</h3>
-              <div className="p-4">{JSON.stringify(stock, null, 2)}</div>
+              <pre className="p-4">
+                <code>{JSON.stringify(stock.quote, null, 2)}</code>
+              </pre>
               <div className="grid grid-cols-2 gap-4">
                 <a
                   className="border-4 text-center border-green-400"

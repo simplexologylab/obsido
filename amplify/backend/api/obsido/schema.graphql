@@ -3,6 +3,7 @@ type Stock @model {
   name: String
   ticker: String!
   overview: Overview
+  quote: Quote
 }
 
 type Overview {
@@ -16,6 +17,17 @@ type Overview {
   last52Low: String
   dma50: String
   dma200: String
+}
+
+type Quote {
+  open: String
+  high: String
+  low: String
+  price: String
+  volume: String
+  prevClose: String
+  change: String
+  changePercent: String
 }
 
 type Query {
