@@ -15,9 +15,20 @@ export const getStock = /* GraphQL */ `
   query GetStock($id: ID!) {
     getStock(id: $id) {
       id
-      description
+      name
       ticker
-      eps
+      overview {
+        exchange
+        currency
+        description
+        sector
+        marketCap
+        dividendYield
+        last52High
+        last52Low
+        dma50
+        dma200
+      }
       createdAt
       updatedAt
     }
@@ -32,9 +43,20 @@ export const listStocks = /* GraphQL */ `
     listStocks(filter: $filter, limit: $limit, nextToken: $nextToken) {
       items {
         id
-        description
+        name
         ticker
-        eps
+        overview {
+          exchange
+          currency
+          description
+          sector
+          marketCap
+          dividendYield
+          last52High
+          last52Low
+          dma50
+          dma200
+        }
         createdAt
         updatedAt
       }

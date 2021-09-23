@@ -5,9 +5,20 @@ export const onCreateStock = /* GraphQL */ `
   subscription OnCreateStock {
     onCreateStock {
       id
-      description
+      name
       ticker
-      eps
+      overview {
+        exchange
+        currency
+        description
+        sector
+        marketCap
+        dividendYield
+        last52High
+        last52Low
+        dma50
+        dma200
+      }
       createdAt
       updatedAt
     }
@@ -17,9 +28,20 @@ export const onUpdateStock = /* GraphQL */ `
   subscription OnUpdateStock {
     onUpdateStock {
       id
-      description
+      name
       ticker
-      eps
+      overview {
+        exchange
+        currency
+        description
+        sector
+        marketCap
+        dividendYield
+        last52High
+        last52Low
+        dma50
+        dma200
+      }
       createdAt
       updatedAt
     }
@@ -29,9 +51,20 @@ export const onDeleteStock = /* GraphQL */ `
   subscription OnDeleteStock {
     onDeleteStock {
       id
-      description
+      name
       ticker
-      eps
+      overview {
+        exchange
+        currency
+        description
+        sector
+        marketCap
+        dividendYield
+        last52High
+        last52Low
+        dma50
+        dma200
+      }
       createdAt
       updatedAt
     }

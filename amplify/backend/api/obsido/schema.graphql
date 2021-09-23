@@ -1,8 +1,21 @@
 type Stock @model {
   id: ID!
-  description: String
+  name: String
   ticker: String!
-  eps: String
+  overview: Overview
+}
+
+type Overview {
+  exchange: String
+  currency: String
+  description: String
+  sector: String
+  marketCap: String
+  dividendYield: String
+  last52High: String
+  last52Low: String
+  dma50: String
+  dma200: String
 }
 
 type Query {

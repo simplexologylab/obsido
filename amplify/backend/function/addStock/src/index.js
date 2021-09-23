@@ -16,8 +16,19 @@ const createStock = gql`
     createStock(input: $input) {
       id
       ticker
-      description
-      eps
+      name
+      overview {
+        exchange
+        currency
+        description
+        sector
+        marketCap
+        dividendYield
+        last52High
+        last52Low
+        dma50
+        dma200
+      }
       createdAt
       updatedAt
     }
@@ -37,12 +48,12 @@ const listStocks = gql`
 
 exports.handler = async (event) => {
   try {
-
     const stockData = await axios({
       method: "get",
       url: `https://www.alphavantage.co/query?function=OVERVIEW&symbol=${event.arguments.ticker}&apikey=6GUGOE51J9KLH0O2`,
     });
 
+    console.log("hello")
     const current = await axios({
       url: process.env.API_OBSIDO_GRAPHQLAPIENDPOINTOUTPUT,
       method: "post",
@@ -71,8 +82,19 @@ exports.handler = async (event) => {
           variables: {
             input: {
               ticker: event.arguments.ticker.toUpperCase(),
-              description: stockData.data.Name,
-              eps: stockData.data.EPS,
+              name: stockData.data.Name,
+              overview: {
+                exchange: stockData.data.Exchange,
+                currency: stockData.data.Currency,
+                description: stockData.data.Description,
+                sector: stockData.data.Sector,
+                marketCap: stockData.data.MarketCapitalization,
+                dividendYield: stockData.data.DividendYield,
+                last52High: stockData.data["52WeekHigh"],
+                last52Low: stockData.data["52WeekLow"],
+                dma50: stockData.data["50DayMovingAverage"],
+                dma200: stockData.data["200DayMovingAverage"],
+              },
             },
           },
         },
@@ -80,9 +102,9 @@ exports.handler = async (event) => {
 
       return create.data.data.createStock;
     } else {
-      throw new Error('We already have this')
+      throw new Error("We already have this");
     }
   } catch (err) {
-    throw new Error(err)
+    throw new Error(err);
   }
 };

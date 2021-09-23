@@ -5,9 +5,20 @@ export const addStock = /* GraphQL */ `
   mutation AddStock($ticker: String) {
     addStock(ticker: $ticker) {
       id
-      description
+      name
       ticker
-      eps
+      overview {
+        exchange
+        currency
+        description
+        sector
+        marketCap
+        dividendYield
+        last52High
+        last52Low
+        dma50
+        dma200
+      }
       createdAt
       updatedAt
     }
@@ -20,9 +31,20 @@ export const createStock = /* GraphQL */ `
   ) {
     createStock(input: $input, condition: $condition) {
       id
-      description
+      name
       ticker
-      eps
+      overview {
+        exchange
+        currency
+        description
+        sector
+        marketCap
+        dividendYield
+        last52High
+        last52Low
+        dma50
+        dma200
+      }
       createdAt
       updatedAt
     }
@@ -35,9 +57,20 @@ export const updateStock = /* GraphQL */ `
   ) {
     updateStock(input: $input, condition: $condition) {
       id
-      description
+      name
       ticker
-      eps
+      overview {
+        exchange
+        currency
+        description
+        sector
+        marketCap
+        dividendYield
+        last52High
+        last52Low
+        dma50
+        dma200
+      }
       createdAt
       updatedAt
     }
@@ -50,9 +83,20 @@ export const deleteStock = /* GraphQL */ `
   ) {
     deleteStock(input: $input, condition: $condition) {
       id
-      description
+      name
       ticker
-      eps
+      overview {
+        exchange
+        currency
+        description
+        sector
+        marketCap
+        dividendYield
+        last52High
+        last52Low
+        dma50
+        dma200
+      }
       createdAt
       updatedAt
     }

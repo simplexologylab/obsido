@@ -15,7 +15,7 @@
       "function": {
         "addStock": {
           "deploymentBucketName": "amplify-obsido-dev-75210-deployment",
-          "s3Key": "amplify-builds/addStock-34595168583756363552-build.zip"
+          "s3Key": "amplify-builds/addStock-4b4a7836314e6158684d-build.zip"
         }
       }
     }
