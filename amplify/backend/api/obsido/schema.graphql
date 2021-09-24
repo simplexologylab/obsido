@@ -37,4 +37,5 @@ type Query {
 
 type Mutation {
   addStock(ticker: String): Stock! @function(name: "addStock-${env}")
+  updateStockData(id: String): Stock! @function(name: "updateStockData-${env}")
 }

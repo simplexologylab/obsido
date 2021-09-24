@@ -34,6 +34,39 @@ export const addStock = /* GraphQL */ `
     }
   }
 `;
+export const updateStockData = /* GraphQL */ `
+  mutation UpdateStockData($id: String) {
+    updateStockData(id: $id) {
+      id
+      name
+      ticker
+      overview {
+        exchange
+        currency
+        description
+        sector
+        marketCap
+        dividendYield
+        last52High
+        last52Low
+        dma50
+        dma200
+      }
+      quote {
+        open
+        high
+        low
+        price
+        volume
+        prevClose
+        change
+        changePercent
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
 export const createStock = /* GraphQL */ `
   mutation CreateStock(
     $input: CreateStockInput!
