@@ -4,6 +4,18 @@ type Stock @model {
   ticker: String!
   overview: Overview
   quote: Quote
+  holdings: [Holding] @connection(name: "StockHoldings")
+}
+
+type Holding @model{
+  id: ID!
+  shares: Float!
+  costBasis: Float!
+  purchaseDate: AWSDate!
+  brokerage: String!
+  soldDate:AWSDate
+  notes: String
+  stock: Stock @connection(name: "StockHoldings")
 }
 
 type Overview {

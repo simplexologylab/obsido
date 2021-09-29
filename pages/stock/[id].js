@@ -10,7 +10,7 @@ import {
 } from "aws-amplify";
 
 import { getStock as GetStock } from "../../src/graphql/queries";
-import { updateStockData as UpdateStockData } from "../../src/graphql/mutations";
+import { updateStockData as UpdateStockData, createHolding as CreateHolding } from "../../src/graphql/mutations";
 
 import awsExports from "../../src/aws-exports";
 
@@ -21,6 +21,7 @@ export default function Stock() {
   const { id } = router.query;
 
   const [stockInfo, setStockInfo] = useState(null);
+  const [holdings, setHoldings] = useState([])
 
   useEffect(() => {
     getStockInfo();
@@ -33,11 +34,31 @@ export default function Stock() {
           id: stockInfo.id,
         })
       );
-      console.log('updating >>>', stockData.data.updateStockData)
       setStockInfo(stockData.data.updateStockData);
     } catch ({ errors }) {
       console.log("Errors: ", errors);
       throw new Error(errors[0]);
+    }
+  }
+
+  async function addHolding() {
+    try {
+      const holding = await API.graphql(
+        graphqlOperation(CreateHolding, {
+          input:{
+            brokerage: "Fidelity", 
+            costBasis: 50, 
+            holdingStockId: stockInfo.id, 
+            purchaseDate: "2021-01-02", 
+            shares: 10
+          },
+        })
+      )
+      setHoldings([...holdings, holding.data.createHolding])
+
+    } catch ({ errors }) {
+      console.log("Errors: ", errors)
+      throw new Error(errors[0])
     }
   }
 
@@ -51,6 +72,7 @@ export default function Stock() {
         );
 
         setStockInfo(data.getStock);
+        setHoldings(data.getStock.holdings.items)
       } else {
         console.log("No ID!!!");
       }
@@ -69,9 +91,15 @@ export default function Stock() {
           <button className="m-4" onClick={updateStockInfo}>
             Update Stock
           </button>
+          <button className="m-4" onClick={addHolding}>
+            Add Holding
+          </button>
         </div>
         <pre className="p-10 md:p-20">
           <code>{JSON.stringify(stockInfo.updatedAt, null, 2)}</code>
+        </pre>
+        <pre className="p-10 md:p-20">
+          <code>{JSON.stringify(holdings, null, 2)}</code>
         </pre>
         <pre className="p-10 md:p-20">
           <code>{JSON.stringify(stockInfo.overview, null, 2)}</code>
