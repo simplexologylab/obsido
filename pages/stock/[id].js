@@ -10,7 +10,11 @@ import {
 } from "aws-amplify";
 
 import { getStock as GetStock } from "../../src/graphql/queries";
-import { updateStockData as UpdateStockData, createHolding as CreateHolding } from "../../src/graphql/mutations";
+import {
+  updateStockData as UpdateStockData,
+  createHolding as CreateHolding,
+  deleteHolding as DeleteHolding,
+} from "../../src/graphql/mutations";
 
 import awsExports from "../../src/aws-exports";
 
@@ -21,7 +25,7 @@ export default function Stock() {
   const { id } = router.query;
 
   const [stockInfo, setStockInfo] = useState(null);
-  const [holdings, setHoldings] = useState([])
+  const [holdings, setHoldings] = useState([]);
 
   useEffect(() => {
     getStockInfo();
@@ -45,20 +49,37 @@ export default function Stock() {
     try {
       const holding = await API.graphql(
         graphqlOperation(CreateHolding, {
-          input:{
-            brokerage: "Fidelity", 
-            costBasis: 50, 
-            holdingStockId: stockInfo.id, 
-            purchaseDate: "2021-01-02", 
-            shares: 10
+          input: {
+            brokerage: "Fidelity",
+            costBasis: 50,
+            holdingStockId: stockInfo.id,
+            purchaseDate: "2021-01-02",
+            shares: 10,
           },
         })
-      )
-      setHoldings([...holdings, holding.data.createHolding])
-
+      );
+      setHoldings([...holdings, holding.data.createHolding]);
     } catch ({ errors }) {
-      console.log("Errors: ", errors)
-      throw new Error(errors[0])
+      console.log("Errors: ", errors);
+      throw new Error(errors[0]);
+    }
+  }
+
+  async function removeHolding(id) {
+    try {
+      const remove = await API.graphql(
+        graphqlOperation(DeleteHolding, {
+          input: {
+            id: id,
+          },
+        })
+      );
+      setHoldings(
+        holdings.filter(({ id }) => id !== remove.data.deleteHolding.id)
+      );
+    } catch ({ errors }) {
+      console.log("Errors: ", errors);
+      throw new Error(errors[0]);
     }
   }
 
@@ -72,7 +93,7 @@ export default function Stock() {
         );
 
         setStockInfo(data.getStock);
-        setHoldings(data.getStock.holdings.items)
+        setHoldings(data.getStock.holdings.items);
       } else {
         console.log("No ID!!!");
       }
@@ -98,9 +119,13 @@ export default function Stock() {
         <pre className="p-10 md:p-20">
           <code>{JSON.stringify(stockInfo.updatedAt, null, 2)}</code>
         </pre>
-        <pre className="p-10 md:p-20">
-          <code>{JSON.stringify(holdings, null, 2)}</code>
-        </pre>
+
+        {holdings.map((holding) => (
+          <pre className="p-10 md:p-20" key={holding.id}>
+            <code>{JSON.stringify(holding, null, 2)}</code>
+            <button onClick={() => removeHolding(holding.id)}>delete</button>
+          </pre>
+        ))}
         <pre className="p-10 md:p-20">
           <code>{JSON.stringify(stockInfo.overview, null, 2)}</code>
         </pre>
