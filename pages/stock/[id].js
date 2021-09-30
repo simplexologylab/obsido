@@ -109,6 +109,15 @@ export default function Stock() {
     }
   }
 
+  function calcCostBasis({shares, costBasis}) {
+    const currency = new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    }) 
+
+    return currency.format(shares * costBasis)
+  }
+
   if (stockInfo) {
     return (
       <div className="flex flex-col justify-center">
@@ -172,8 +181,10 @@ export default function Stock() {
               <tr>
                 <th className="border">Shares</th>
                 <th className="border">Cost</th>
+                <th className="border">Cost Basis</th>
                 <th className="border">Purchase Date</th>
                 <th className="border">Actions</th>
+
               </tr>
             </thead>
             <tbody>
@@ -181,6 +192,7 @@ export default function Stock() {
                 <tr key={holding.id}>
                   <td className="border p-2">{holding.shares}</td>
                   <td className="border p-2">{holding.costBasis}</td>
+                  <td className="border p-2">{calcCostBasis(holding)}</td>
                   <td className="border p-2">{holding.purchaseDate}</td>
                   <td className="border p-2">
                     {" "}

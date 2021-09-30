@@ -168,6 +168,41 @@ export default function Home() {
             </div>
           ))}
         </div>
+        <table className="table-auto border-collapse m-2">
+          <thead>
+            <tr>
+              <th className="border">Ticker</th>
+              <th className="border">Shares Owned</th>
+              <th className="border">Market Cap</th>
+              <th className="border">Latest Price</th>
+              <th className="border">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {stocks.map((stock) => (
+              <tr key={stock.id}>
+                <td className="border p-2">{stock.ticker}</td>
+                <td className="border p-2">{stock.ticker}</td>
+                <td className="border p-2">{stock.overview.marketCap}</td>
+                <td className="border p-2">{stock.quote.price}</td>
+                <td className="flex flex-row gap-3 border p-2">
+                  <a
+                    className="p-2 text-center bg-green-400"
+                    href={`/stock/${stock.id}`}
+                  >
+                    view
+                  </a>
+                  <button
+                    className="p-2 text-center bg-red-400"
+                    onClick={() => handleDeleteStock(stock.id)}
+                  >
+                    delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </main>
     </div>
   );
