@@ -26,6 +26,7 @@ export default function Stock() {
 
   const [stockInfo, setStockInfo] = useState(null);
   const [holdings, setHoldings] = useState([]);
+  const [adding, setAdding] = useState(false);
 
   useEffect(() => {
     getStockInfo();
@@ -45,16 +46,21 @@ export default function Stock() {
     }
   }
 
-  async function addHolding() {
+  async function handleAddHolding(event) {
+    event.preventDefault();
+
+    const form = new FormData(event.target);
+
     try {
       const holding = await API.graphql(
         graphqlOperation(CreateHolding, {
           input: {
-            brokerage: "Fidelity",
-            costBasis: 50,
+            brokerage: form.get("brokerage"),
+            costBasis: form.get("costBasis"),
             holdingStockId: stockInfo.id,
             purchaseDate: "2021-01-02",
-            shares: 10,
+            shares: form.get("shares"),
+            notes: form.get("notes"),
           },
         })
       );
@@ -65,7 +71,7 @@ export default function Stock() {
     }
   }
 
-  async function removeHolding(id) {
+  async function handleRemoveHolding(id) {
     try {
       const remove = await API.graphql(
         graphqlOperation(DeleteHolding, {
@@ -112,25 +118,83 @@ export default function Stock() {
           <button className="m-4" onClick={updateStockInfo}>
             Update Stock
           </button>
-          <button className="m-4" onClick={addHolding}>
-            Add Holding
+          <button className="m-4" onClick={() => setAdding(!adding)}>
+            {adding ? "Close" : "Add Holding"}
           </button>
         </div>
+        {adding && (
+          <div className="p-10 bg-gray-400">
+            <form onSubmit={handleAddHolding}>
+              <fieldset className="flex flex-col gap-3 p-10">
+                <input
+                  className="p-2"
+                  placeholder="Enter # Shares"
+                  defaultValue={``}
+                  name="shares"
+                />
+                <label htmlFor="shares">Shares</label>
+                <input
+                  className="p-2"
+                  placeholder="Enter Cost Basis"
+                  defaultValue={``}
+                  name="costBasis"
+                />
+                <label htmlFor="costBasis">Cost Basis</label>
+                <input
+                  className="p-2"
+                  placeholder="Purchase Date"
+                  defaultValue={``}
+                  name="purchaseDate"
+                />
+                <label htmlFor="purchaseDate">Purchase Date</label>
+                <input
+                  className="p-2"
+                  placeholder="Brokerage"
+                  defaultValue={``}
+                  name="brokerage"
+                />
+                <label htmlFor="brokerage">Brokerage</label>
+                <input
+                  className="p-2"
+                  placeholder="Notes"
+                  defaultValue={``}
+                  name="notes"
+                />
+                <label htmlFor="notes">Notes</label>
+              </fieldset>
+              <button className="border-2 p-2 bg-white">Add Holding</button>
+            </form>
+          </div>
+        )}
+        {holdings.length > 0 && (
+          <table className="table-auto border-collapse m-2">
+            <thead>
+              <tr>
+                <th className="border">Shares</th>
+                <th className="border">Cost</th>
+                <th className="border">Purchase Date</th>
+                <th className="border">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {holdings.map((holding) => (
+                <tr key={holding.id}>
+                  <td className="border p-2">{holding.shares}</td>
+                  <td className="border p-2">{holding.costBasis}</td>
+                  <td className="border p-2">{holding.purchaseDate}</td>
+                  <td className="border p-2">
+                    {" "}
+                    <button onClick={() => handleRemoveHolding(holding.id)}>
+                      delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
         <pre className="p-10 md:p-20">
-          <code>{JSON.stringify(stockInfo.updatedAt, null, 2)}</code>
-        </pre>
-
-        {holdings.map((holding) => (
-          <pre className="p-10 md:p-20" key={holding.id}>
-            <code>{JSON.stringify(holding, null, 2)}</code>
-            <button onClick={() => removeHolding(holding.id)}>delete</button>
-          </pre>
-        ))}
-        <pre className="p-10 md:p-20">
-          <code>{JSON.stringify(stockInfo.overview, null, 2)}</code>
-        </pre>
-        <pre className="p-10 md:p-20">
-          <code>{JSON.stringify(stockInfo.quote, null, 2)}</code>
+          <code>{JSON.stringify(stockInfo, null, 2)}</code>
         </pre>
       </div>
     );
