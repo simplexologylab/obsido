@@ -58,6 +58,7 @@ export default function Home() {
             stockData.data.listStocks.items
           )
         );
+
         setStocks(stockData.data.listStocks.items);
         setHoldings(holdingData.data.listHoldings.items);
       } catch (err) {
@@ -160,7 +161,7 @@ export default function Home() {
         <div>
           <pre>{JSON.stringify(totals, null, 2)}</pre>
         </div>
-       
+
         <table className="table-auto border-collapse m-2">
           <thead>
             <tr>
@@ -168,25 +169,59 @@ export default function Home() {
               <th className="border">Shares Owned</th>
               <th className="border">Market Cap</th>
               <th className="border">Latest Price</th>
+              <th className="border">Holdings</th>
+              <th className="border">Gain/Loss</th>
+              <th className="border">Cost Basis</th>
+              <th className="border">Current Value</th>
               <th className="border">Actions</th>
             </tr>
           </thead>
           <tbody>
             {stocks.map((stock) => (
               <tr key={stock.id}>
-                <td className="border p-2">{stock.ticker}</td>
-                <td className="border p-2">{stock.ticker}</td>
-                <td className="border p-2">{stock.overview.marketCap}</td>
-                <td className="border p-2">{stock.quote.price}</td>
-                <td className="flex flex-row gap-3 border p-2">
+                <td className="border p-1">{stock.ticker}</td>
+                <td className="border p-1">{stock.ticker}</td>
+                <td className="border p-1">{stock.overview.marketCap}</td>
+                <td className="border p-1">{stock.quote.price}</td>
+                <td className="border p-1">
+                  {
+                    holdings.filter((h) => h.stock.ticker === stock.ticker)
+                      .length
+                  }
+                </td>
+                <td className="border p-1">
+                  {
+                    calcHoldingTotals(
+                      holdings.filter((h) => h.stock.ticker === stock.ticker),
+                      stock.quote.price
+                    ).gainLoss
+                  }
+                </td>
+                <td className="border p-1">
+                  {
+                    calcHoldingTotals(
+                      holdings.filter((h) => h.stock.ticker === stock.ticker),
+                      stock.quote.price
+                    ).costBasis
+                  }
+                </td>
+                <td className="border p-1">
+                  {
+                    calcHoldingTotals(
+                      holdings.filter((h) => h.stock.ticker === stock.ticker),
+                      stock.quote.price
+                    ).currentValue
+                  }
+                </td>
+                <td className="flex flex-row gap-3 border p-1">
                   <a
-                    className="p-2 text-center bg-green-400"
+                    className="p-1 text-center bg-green-400"
                     href={`/stock/${stock.id}`}
                   >
                     view
                   </a>
                   <button
-                    className="p-2 text-center bg-red-400"
+                    className="p-1 text-center bg-red-400"
                     onClick={() => handleDeleteStock(stock.id)}
                   >
                     delete

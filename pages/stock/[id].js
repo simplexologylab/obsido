@@ -220,9 +220,9 @@ export default function Stock() {
             </table>
           </div>
         )}
-        <pre className="p-10 md:p-20">
+        {/* <pre className="p-10 md:p-20">
           <code>{JSON.stringify(stockInfo, null, 2)}</code>
-        </pre>
+        </pre> */}
       </div>
     );
   } else {

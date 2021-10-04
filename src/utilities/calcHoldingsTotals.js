@@ -11,8 +11,6 @@ export default function calcHoldingsTotals(holdings, stocks) {
     gainLoss: 0,
   };
 
-  console.log("HOLDINGS: ", holdings);
-
   holdings.forEach(({ shares, costBasis, stock }) => {
     if (stock) { // have some bad data where stock deleted but not holding
       total.shares = total.shares + shares;
@@ -27,13 +25,11 @@ export default function calcHoldingsTotals(holdings, stocks) {
   //   (total.shares * price - total.costBasis) /
   //   total.costBasis
   // ).toFixed(3);
-  // total.average = currency.format(total.costBasis / total.shares);
-  total.overallPercent = (total.gainLoss/total.costBasis).toFixed(3)
+  total.shares = total.shares.toFixed(3)
+  total.overallPercent = (total.gainLoss/total.costBasis * 100).toFixed(3)
   total.costBasis = currency.format(total.costBasis);
   total.currentValue = currency.format(total.currentValue);
   total.gainLoss = currency.format(total.gainLoss)
-
-  console.log("Total: ", total);
 
   return total;
 }
