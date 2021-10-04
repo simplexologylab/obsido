@@ -17,7 +17,14 @@ import {
   deleteStock as DeleteStock,
 } from "../src/graphql/mutations";
 
-import { listStocks } from "../src/graphql/queries";
+import {
+  listStocks,
+  listHoldings,
+  deleteHolding as DeleteHolding,
+} from "../src/graphql/queries";
+
+import calcHoldingTotals from "../src/utilities/calcHoldingTotals";
+import calcHoldingsTotals from "../src/utilities/calcHoldingsTotals";
 
 Amplify.configure({ ...awsExports, ssr: true });
 
@@ -36,19 +43,30 @@ export default function Home() {
   const [stocks, setStocks] = useState([]);
   const [showAdd, setShowAdd] = useState(false);
   const [errors, setErrors] = useState([]);
+  const [holdings, setHoldings] = useState([]);
+  const [totals, setTotals] = useState({});
 
   useEffect(() => {
-    getStocks();
-  }, []);
+    async function getStocks() {
+      try {
+        const stockData = await API.graphql(graphqlOperation(listStocks));
+        const holdingData = await API.graphql(graphqlOperation(listHoldings));
 
-  async function getStocks() {
-    try {
-      const { data } = await API.graphql(graphqlOperation(listStocks));
-      setStocks(data.listStocks.items);
-    } catch (err) {
-      setErrors([...errors, "Issue with API call to get list of stocks"]);
+        setTotals(
+          calcHoldingsTotals(
+            holdingData.data.listHoldings.items,
+            stockData.data.listStocks.items
+          )
+        );
+        setStocks(stockData.data.listStocks.items);
+        setHoldings(holdingData.data.listHoldings.items);
+      } catch (err) {
+        setErrors([...errors, "Issue with API call to get list of stocks"]);
+      }
     }
-  }
+
+    getStocks();
+  }, [errors]);
 
   async function handleCreateStock(event) {
     event.preventDefault();
@@ -93,7 +111,7 @@ export default function Home() {
   return (
     <div>
       <Head>
-        <title>Learn SSR</title>
+        <title>Obsido | Home</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -103,7 +121,7 @@ export default function Home() {
             Obsido
           </h2>
           <button
-            className="w-sm border-2 m-4 p-2 bg-green-600 text-white border-2 border-gray"
+            className="w-sm m-4 p-2 bg-green-600 text-white border-2 border-gray"
             onClick={() => setShowAdd(!showAdd)}
           >
             {showAdd ? "Cancel" : "Add Stock"}
@@ -139,35 +157,10 @@ export default function Home() {
         )}
         {errors.length > 0 && <div>{JSON.stringify(errors, null, 2)}</div>}
 
-        {/* <p className="p-5 text-xl text-center">{`${stocks.length} stocks`}</p> */}
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-10">
-          {stocks.map((stock) => (
-            <div
-              className="flex flex-col border-4 p-6 rounded-sm "
-              key={stock.id}
-            >
-              <h3 className="text-xl text-center">{stock.ticker}</h3>
-              <pre className="p-4">
-                <code>{JSON.stringify(stock.quote, null, 2)}</code>
-              </pre>
-              <div className="grid grid-cols-2 gap-4">
-                <a
-                  className="border-4 text-center border-green-400"
-                  href={`/stock/${stock.id}`}
-                >
-                  View Stock
-                </a>
-                <button
-                  className="border-2 border-red-300"
-                  onClick={() => handleDeleteStock(stock.id)}
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))}
+        <div>
+          <pre>{JSON.stringify(totals, null, 2)}</pre>
         </div>
+       
         <table className="table-auto border-collapse m-2">
           <thead>
             <tr>

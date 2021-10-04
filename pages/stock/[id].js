@@ -18,6 +18,8 @@ import {
 
 import awsExports from "../../src/aws-exports";
 
+import calcHoldingTotals from "../../src/utilities/calcHoldingTotals"
+
 Amplify.configure({ ...awsExports, ssr: true });
 
 export default function Stock() {
@@ -25,12 +27,37 @@ export default function Stock() {
   const { id } = router.query;
 
   const [stockInfo, setStockInfo] = useState(null);
+  const [totals, setTotals] = useState({});
   const [holdings, setHoldings] = useState([]);
   const [adding, setAdding] = useState(false);
 
   useEffect(() => {
-    getStockInfo();
-  }, [id]);
+    console.log("In the Effect");
+    
+
+    async function updateStock() {
+      const { data } = await API.graphql(
+        graphqlOperation(GetStock, {
+          id: id,
+        })
+      );
+
+      setStockInfo(data.getStock);
+      setHoldings(data.getStock.holdings.items);
+      setTotals(calcHoldingTotals(data.getStock.holdings.items, data.getStock.quote.price));
+    }
+
+    try {
+      if (id) {
+        updateStock();
+      } else {
+        console.log("No ID!!!");
+      }
+    } catch (err) {
+      console.error(err);
+      throw new Error(err);
+    }
+  }, [id, holdings.length]);
 
   async function updateStockInfo() {
     try {
@@ -89,34 +116,19 @@ export default function Stock() {
     }
   }
 
-  async function getStockInfo() {
-    try {
-      if (id) {
-        const { data } = await API.graphql(
-          graphqlOperation(GetStock, {
-            id: id,
-          })
-        );
+  function calcCostBasis({ shares, costBasis }) {
+    const currency = new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    });
 
-        setStockInfo(data.getStock);
-        setHoldings(data.getStock.holdings.items);
-      } else {
-        console.log("No ID!!!");
-      }
-    } catch (err) {
-      console.error(err);
-      throw new Error(err);
-    }
+    return currency.format(shares * costBasis);
   }
 
-  function calcCostBasis({shares, costBasis}) {
-    const currency = new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }) 
-
-    return currency.format(shares * costBasis)
-  }
+  const currency = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  });
 
   if (stockInfo) {
     return (
@@ -176,34 +188,37 @@ export default function Stock() {
           </div>
         )}
         {holdings.length > 0 && (
-          <table className="table-auto border-collapse m-2">
-            <thead>
-              <tr>
-                <th className="border">Shares</th>
-                <th className="border">Cost</th>
-                <th className="border">Cost Basis</th>
-                <th className="border">Purchase Date</th>
-                <th className="border">Actions</th>
-
-              </tr>
-            </thead>
-            <tbody>
-              {holdings.map((holding) => (
-                <tr key={holding.id}>
-                  <td className="border p-2">{holding.shares}</td>
-                  <td className="border p-2">{holding.costBasis}</td>
-                  <td className="border p-2">{calcCostBasis(holding)}</td>
-                  <td className="border p-2">{holding.purchaseDate}</td>
-                  <td className="border p-2">
-                    {" "}
-                    <button onClick={() => handleRemoveHolding(holding.id)}>
-                      delete
-                    </button>
-                  </td>
+          <div>
+            <pre>{JSON.stringify(totals, null, 2)}</pre>
+            <p>{totals.costBasis} | {totals.average} </p>
+            <table className="table-auto border-collapse m-2">
+              <thead>
+                <tr>
+                  <th className="border">Shares</th>
+                  <th className="border">Cost</th>
+                  <th className="border">Cost Basis</th>
+                  <th className="border">Purchase Date</th>
+                  <th className="border">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {holdings.map((holding) => (
+                  <tr key={holding.id}>
+                    <td className="border p-2">{holding.shares}</td>
+                    <td className="border p-2">{holding.costBasis}</td>
+                    <td className="border p-2">{calcCostBasis(holding)}</td>
+                    <td className="border p-2">{holding.purchaseDate}</td>
+                    <td className="border p-2">
+                      {" "}
+                      <button onClick={() => handleRemoveHolding(holding.id)}>
+                        delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
         <pre className="p-10 md:p-20">
           <code>{JSON.stringify(stockInfo, null, 2)}</code>
