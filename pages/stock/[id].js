@@ -18,8 +18,6 @@ import {
 
 import awsExports from "../../src/aws-exports";
 
-import calcHoldingTotals from "../../src/utilities/calcHoldingTotals"
-
 Amplify.configure({ ...awsExports, ssr: true });
 
 export default function Stock() {
@@ -27,13 +25,11 @@ export default function Stock() {
   const { id } = router.query;
 
   const [stockInfo, setStockInfo] = useState(null);
-  const [totals, setTotals] = useState({});
   const [holdings, setHoldings] = useState([]);
   const [adding, setAdding] = useState(false);
 
   useEffect(() => {
     console.log("In the Effect");
-    
 
     async function updateStock() {
       const { data } = await API.graphql(
@@ -44,7 +40,6 @@ export default function Stock() {
 
       setStockInfo(data.getStock);
       setHoldings(data.getStock.holdings.items);
-      setTotals(calcHoldingTotals(data.getStock.holdings.items, data.getStock.quote.price));
     }
 
     try {
@@ -116,15 +111,6 @@ export default function Stock() {
     }
   }
 
-  function calcCostBasis({ shares, costBasis }) {
-    const currency = new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    });
-
-    return currency.format(shares * costBasis);
-  }
-
   const currency = new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
@@ -189,8 +175,7 @@ export default function Stock() {
         )}
         {holdings.length > 0 && (
           <div>
-            <pre>{JSON.stringify(totals, null, 2)}</pre>
-            <p>{totals.costBasis} | {totals.average} </p>
+            <pre>{JSON.stringify(stockInfo.calculations, null, 2)}</pre>
             <table className="table-auto border-collapse m-2">
               <thead>
                 <tr>
@@ -205,8 +190,12 @@ export default function Stock() {
                 {holdings.map((holding) => (
                   <tr key={holding.id}>
                     <td className="border p-2">{holding.shares}</td>
-                    <td className="border p-2">{holding.costBasis}</td>
-                    <td className="border p-2">{calcCostBasis(holding)}</td>
+                    <td className="border p-2">
+                      {currency.format(holding.costBasis)}
+                    </td>
+                    <td className="border p-2">
+                      {currency.format(holding.costBasis * holding.shares)}
+                    </td>
                     <td className="border p-2">{holding.purchaseDate}</td>
                     <td className="border p-2">
                       {" "}
@@ -220,9 +209,9 @@ export default function Stock() {
             </table>
           </div>
         )}
-        {/* <pre className="p-10 md:p-20">
+        <pre className="p-10 md:p-20">
           <code>{JSON.stringify(stockInfo, null, 2)}</code>
-        </pre> */}
+        </pre>
       </div>
     );
   } else {

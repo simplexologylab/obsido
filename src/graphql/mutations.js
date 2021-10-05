@@ -43,6 +43,14 @@ export const addStock = /* GraphQL */ `
         }
         nextToken
       }
+      calculations {
+        stockTotalShares
+        stockCostBasis
+        stockGainLoss
+        stockCurrentValue
+        stockAvgPerShare
+        stockGainLossPercent
+      }
       createdAt
       updatedAt
     }
@@ -89,6 +97,14 @@ export const updateStockData = /* GraphQL */ `
           updatedAt
         }
         nextToken
+      }
+      calculations {
+        stockTotalShares
+        stockCostBasis
+        stockGainLoss
+        stockCurrentValue
+        stockAvgPerShare
+        stockGainLossPercent
       }
       createdAt
       updatedAt
@@ -140,6 +156,14 @@ export const createStock = /* GraphQL */ `
         }
         nextToken
       }
+      calculations {
+        stockTotalShares
+        stockCostBasis
+        stockGainLoss
+        stockCurrentValue
+        stockAvgPerShare
+        stockGainLossPercent
+      }
       createdAt
       updatedAt
     }
@@ -189,6 +213,14 @@ export const updateStock = /* GraphQL */ `
           updatedAt
         }
         nextToken
+      }
+      calculations {
+        stockTotalShares
+        stockCostBasis
+        stockGainLoss
+        stockCurrentValue
+        stockAvgPerShare
+        stockGainLossPercent
       }
       createdAt
       updatedAt
@@ -240,6 +272,14 @@ export const deleteStock = /* GraphQL */ `
         }
         nextToken
       }
+      calculations {
+        stockTotalShares
+        stockCostBasis
+        stockGainLoss
+        stockCurrentValue
+        stockAvgPerShare
+        stockGainLossPercent
+      }
       createdAt
       updatedAt
     }
@@ -286,6 +326,14 @@ export const createHolding = /* GraphQL */ `
         }
         holdings {
           nextToken
+        }
+        calculations {
+          stockTotalShares
+          stockCostBasis
+          stockGainLoss
+          stockCurrentValue
+          stockAvgPerShare
+          stockGainLossPercent
         }
         createdAt
         updatedAt
@@ -337,6 +385,14 @@ export const updateHolding = /* GraphQL */ `
         holdings {
           nextToken
         }
+        calculations {
+          stockTotalShares
+          stockCostBasis
+          stockGainLoss
+          stockCurrentValue
+          stockAvgPerShare
+          stockGainLossPercent
+        }
         createdAt
         updatedAt
       }
@@ -386,6 +442,14 @@ export const deleteHolding = /* GraphQL */ `
         }
         holdings {
           nextToken
+        }
+        calculations {
+          stockTotalShares
+          stockCostBasis
+          stockGainLoss
+          stockCurrentValue
+          stockAvgPerShare
+          stockGainLossPercent
         }
         createdAt
         updatedAt

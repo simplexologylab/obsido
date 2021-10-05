@@ -43,6 +43,14 @@ export const onCreateStock = /* GraphQL */ `
         }
         nextToken
       }
+      calculations {
+        stockTotalShares
+        stockCostBasis
+        stockGainLoss
+        stockCurrentValue
+        stockAvgPerShare
+        stockGainLossPercent
+      }
       createdAt
       updatedAt
     }
@@ -89,6 +97,14 @@ export const onUpdateStock = /* GraphQL */ `
           updatedAt
         }
         nextToken
+      }
+      calculations {
+        stockTotalShares
+        stockCostBasis
+        stockGainLoss
+        stockCurrentValue
+        stockAvgPerShare
+        stockGainLossPercent
       }
       createdAt
       updatedAt
@@ -137,6 +153,14 @@ export const onDeleteStock = /* GraphQL */ `
         }
         nextToken
       }
+      calculations {
+        stockTotalShares
+        stockCostBasis
+        stockGainLoss
+        stockCurrentValue
+        stockAvgPerShare
+        stockGainLossPercent
+      }
       createdAt
       updatedAt
     }
@@ -180,6 +204,14 @@ export const onCreateHolding = /* GraphQL */ `
         }
         holdings {
           nextToken
+        }
+        calculations {
+          stockTotalShares
+          stockCostBasis
+          stockGainLoss
+          stockCurrentValue
+          stockAvgPerShare
+          stockGainLossPercent
         }
         createdAt
         updatedAt
@@ -228,6 +260,14 @@ export const onUpdateHolding = /* GraphQL */ `
         holdings {
           nextToken
         }
+        calculations {
+          stockTotalShares
+          stockCostBasis
+          stockGainLoss
+          stockCurrentValue
+          stockAvgPerShare
+          stockGainLossPercent
+        }
         createdAt
         updatedAt
       }
@@ -274,6 +314,14 @@ export const onDeleteHolding = /* GraphQL */ `
         }
         holdings {
           nextToken
+        }
+        calculations {
+          stockTotalShares
+          stockCostBasis
+          stockGainLoss
+          stockCurrentValue
+          stockAvgPerShare
+          stockGainLossPercent
         }
         createdAt
         updatedAt

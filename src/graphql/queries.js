@@ -53,6 +53,14 @@ export const getStock = /* GraphQL */ `
         }
         nextToken
       }
+      calculations {
+        stockTotalShares
+        stockCostBasis
+        stockGainLoss
+        stockCurrentValue
+        stockAvgPerShare
+        stockGainLossPercent
+      }
       createdAt
       updatedAt
     }
@@ -93,6 +101,14 @@ export const listStocks = /* GraphQL */ `
         }
         holdings {
           nextToken
+        }
+        calculations {
+          stockTotalShares
+          stockCostBasis
+          stockGainLoss
+          stockCurrentValue
+          stockAvgPerShare
+          stockGainLossPercent
         }
         createdAt
         updatedAt
@@ -139,6 +155,14 @@ export const getHolding = /* GraphQL */ `
         }
         holdings {
           nextToken
+        }
+        calculations {
+          stockTotalShares
+          stockCostBasis
+          stockGainLoss
+          stockCurrentValue
+          stockAvgPerShare
+          stockGainLossPercent
         }
         createdAt
         updatedAt

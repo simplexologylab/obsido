@@ -5,6 +5,7 @@ type Stock @model {
   overview: Overview
   quote: Quote
   holdings: [Holding] @connection(name: "StockHoldings")
+  calculations: Calculation
 }
 
 type Holding @model{
@@ -40,6 +41,15 @@ type Quote {
   prevClose: String
   change: String
   changePercent: String
+}
+
+type Calculation {
+  stockTotalShares: String
+  stockCostBasis: String
+  stockGainLoss: String
+  stockCurrentValue: String
+  stockAvgPerShare: String
+  stockGainLossPercent: String
 }
 
 type Query {
