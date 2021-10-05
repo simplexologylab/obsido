@@ -190,28 +190,19 @@ export default function Home() {
                   }
                 </td>
                 <td className="border p-1">
-                  {
-                    calcHoldingTotals(
-                      holdings.filter((h) => h.stock.ticker === stock.ticker),
-                      stock.quote.price
-                    ).gainLoss
-                  }
+                  {stock.calculations
+                    ? stock.calculations.stockGainLoss
+                    : "No Holding"}
                 </td>
                 <td className="border p-1">
-                  {
-                    calcHoldingTotals(
-                      holdings.filter((h) => h.stock.ticker === stock.ticker),
-                      stock.quote.price
-                    ).costBasis
-                  }
+                  {stock.calculations
+                    ? stock.calculations.stockCostBasis
+                    : "No Holding"}
                 </td>
                 <td className="border p-1">
-                  {
-                    calcHoldingTotals(
-                      holdings.filter((h) => h.stock.ticker === stock.ticker),
-                      stock.quote.price
-                    ).currentValue
-                  }
+                  {stock.calculations
+                    ? stock.calculations.stockCurrentValue
+                    : "No Holding"}
                 </td>
                 <td className="flex flex-row gap-3 border p-1">
                   <a

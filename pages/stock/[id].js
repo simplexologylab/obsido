@@ -29,17 +29,24 @@ export default function Stock() {
   const [adding, setAdding] = useState(false);
 
   useEffect(() => {
-    console.log("In the Effect");
-
     async function updateStock() {
-      const { data } = await API.graphql(
-        graphqlOperation(GetStock, {
-          id: id,
-        })
-      );
-
-      setStockInfo(data.getStock);
-      setHoldings(data.getStock.holdings.items);
+      if (holdings.length === 0) {
+        const { data } = await API.graphql(
+          graphqlOperation(GetStock, {
+            id: id,
+          })
+        );
+        setStockInfo(data.getStock);
+        setHoldings(data.getStock.holdings.items)
+      } else {
+        const { data } = await API.graphql(
+          graphqlOperation(UpdateStockData, {
+            id: id,
+          })
+        );
+        setStockInfo(data.updateStockData)
+        setHoldings(data.updateStockData.holdings.items)
+      }
     }
 
     try {
@@ -54,19 +61,20 @@ export default function Stock() {
     }
   }, [id, holdings.length]);
 
-  async function updateStockInfo() {
-    try {
-      const stockData = await API.graphql(
-        graphqlOperation(UpdateStockData, {
-          id: stockInfo.id,
-        })
-      );
-      setStockInfo(stockData.data.updateStockData);
-    } catch ({ errors }) {
-      console.log("Errors: ", errors);
-      throw new Error(errors[0]);
-    }
-  }
+  // async function updateStockInfo() {
+  //   try {
+  //     const stockData = await API.graphql(
+  //       graphqlOperation(UpdateStockData, {
+  //         id: stockInfo.id,
+  //       })
+  //     );
+  //     console.log(stockData.data.updateStockData)
+  //     setStockInfo(stockData.data.updateStockData);
+  //   } catch ({ errors }) {
+  //     console.log("Errors: ", errors);
+  //     throw new Error(errors[0]);
+  //   }
+  // }
 
   async function handleAddHolding(event) {
     event.preventDefault();
@@ -122,9 +130,6 @@ export default function Stock() {
         <div className="flex flex-row bg-black text-white justify-center">
           <a href={"/"} className="w-xl p-4">{`< Back`}</a>
           <p className="flex-auto text-xl text-center p-4 ">{stockInfo.name}</p>
-          <button className="m-4" onClick={updateStockInfo}>
-            Update Stock
-          </button>
           <button className="m-4" onClick={() => setAdding(!adding)}>
             {adding ? "Close" : "Add Holding"}
           </button>
@@ -173,7 +178,7 @@ export default function Stock() {
             </form>
           </div>
         )}
-        {holdings.length > 0 && (
+        {holdings.length > 0 ? (
           <div>
             <pre>{JSON.stringify(stockInfo.calculations, null, 2)}</pre>
             <table className="table-auto border-collapse m-2">
@@ -208,6 +213,8 @@ export default function Stock() {
               </tbody>
             </table>
           </div>
+        ) : (
+          "No Holdings"
         )}
         <pre className="p-10 md:p-20">
           <code>{JSON.stringify(stockInfo, null, 2)}</code>

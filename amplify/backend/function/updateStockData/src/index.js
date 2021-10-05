@@ -39,6 +39,14 @@ const updateStock = gql`
         change
         changePercent
       }
+      calculations {
+        stockTotalShares
+        stockCostBasis
+        stockGainLoss
+        stockCurrentValue
+        stockAvgPerShare
+        stockGainLossPercent
+      }
       createdAt
       updatedAt
     }
@@ -73,7 +81,7 @@ function calcStockTotals(holdings, price) {
     shares: 0,
     costBasis: 0,
     gainLoss: 0,
-    gainLossPercent: 0
+    gainLossPercent: 0,
   };
 
   holdings.forEach(({ shares, costBasis }) => {
@@ -86,7 +94,7 @@ function calcStockTotals(holdings, price) {
   //   ((total.shares * price - total.costBasis) / total.costBasis) *
   //   100
   // ).toFixed(3);
-  total.gainLossPercent = (total.gainLoss/total.costBasis).toFixed(3);
+  total.gainLossPercent = (total.gainLoss / total.costBasis).toFixed(3);
   total.average = currency.format(total.costBasis / total.shares);
   total.costBasis = currency.format(total.costBasis);
   total.gainLoss = currency.format(total.gainLoss);
