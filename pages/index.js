@@ -47,6 +47,7 @@ export default function Home() {
   const [errors, setErrors] = useState([]);
   const [holdings, setHoldings] = useState([]);
   const [totals, setTotals] = useState({});
+  const [showDetails, setShowDetails] = useState(false);
 
   useEffect(() => {
     async function getStocks() {
@@ -137,6 +138,22 @@ export default function Home() {
     <Layout headTitle="Obsido | Home">
       <div className="flex flex-col justify-center">
         <button
+          onClick={() => setShowDetails(!showDetails)}
+          className="bg-gray-700 flex justify-center w-full"
+        >
+          {showDetails ? (
+            <pre className="text-yellow-300">
+              {JSON.stringify(totals, null, 2)}
+            </pre>
+          ) : (
+            <div className="p-2">
+              <p className="text-yellow-300 text-3xl">{totals.currentValue}</p>
+              <p className="text-yellow-300 text-2xl">{`${totals.gainLoss} (${totals.overallPercent})`}</p>
+            </div>
+          )}
+        </button>
+        {errors.length > 0 && <div>{JSON.stringify(errors, null, 2)}</div>}
+        <button
           className="w-sm m-4 p-2 bg-green-600 text-white border-2 border-gray"
           onClick={() => setShowAdd(!showAdd)}
         >
@@ -170,13 +187,6 @@ export default function Home() {
             {/* </AmplifyAuthenticator> */}
           </div>
         )}
-        {errors.length > 0 && <div>{JSON.stringify(errors, null, 2)}</div>}
-
-        <div>
-          <pre>{JSON.stringify(totals, null, 2)}</pre>
-        </div>
-        <div></div>
-
         <table className="table-auto border-collapse m-2">
           <thead>
             <tr>

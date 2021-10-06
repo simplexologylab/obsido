@@ -181,10 +181,10 @@ export default function Stock() {
         )}
         <button
           onClick={() => setShowCalcDetails(!showCalcDetails)}
-          className="bg-gray-700"
+          className="bg-gray-700 flex justify-center w-full"
         >
           {showCalcDetails ? (
-            <pre className="text-yellow-300 justify-center">
+            <pre className="text-yellow-300">
               {JSON.stringify(stockInfo.calculations, null, 2)}
             </pre>
           ) : (
