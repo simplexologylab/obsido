@@ -16,6 +16,8 @@ import {
   deleteHolding as DeleteHolding,
 } from "../../src/graphql/mutations";
 
+import Layout from "../../src/components/layout";
+
 import awsExports from "../../src/aws-exports";
 
 Amplify.configure({ ...awsExports, ssr: true });
@@ -27,6 +29,7 @@ export default function Stock() {
   const [stockInfo, setStockInfo] = useState(null);
   const [holdings, setHoldings] = useState([]);
   const [adding, setAdding] = useState(false);
+  const [showCalcDetails, setShowCalcDetails] = useState(false);
 
   useEffect(() => {
     async function updateStock() {
@@ -37,15 +40,15 @@ export default function Stock() {
           })
         );
         setStockInfo(data.getStock);
-        setHoldings(data.getStock.holdings.items)
+        setHoldings(data.getStock.holdings.items);
       } else {
         const { data } = await API.graphql(
           graphqlOperation(UpdateStockData, {
             id: id,
           })
         );
-        setStockInfo(data.updateStockData)
-        setHoldings(data.updateStockData.holdings.items)
+        setStockInfo(data.updateStockData);
+        setHoldings(data.updateStockData.holdings.items);
       }
     }
 
@@ -126,18 +129,23 @@ export default function Stock() {
 
   if (stockInfo) {
     return (
-      <div className="flex flex-col justify-center">
-        <div className="flex flex-row bg-black text-white justify-center">
-          <a href={"/"} className="w-xl p-4">{`< Back`}</a>
-          <p className="flex-auto text-xl text-center p-4 ">{stockInfo.name}</p>
-          <button className="m-4" onClick={() => setAdding(!adding)}>
-            {adding ? "Close" : "Add Holding"}
-          </button>
-        </div>
+      <Layout
+        headTitle={`Obsido | ${stockInfo.ticker}`}
+        pageTitle={stockInfo.name}
+        className="flex flex-col justify-center"
+        backLink="/"
+      >
         {adding && (
           <div className="p-10 bg-gray-400">
             <form onSubmit={handleAddHolding}>
               <fieldset className="flex flex-col gap-3 p-10">
+                <input
+                  className="p-2"
+                  placeholder="Purchase Date"
+                  defaultValue={``}
+                  name="purchaseDate"
+                />
+                <label htmlFor="purchaseDate">Purchase Date</label>
                 <input
                   className="p-2"
                   placeholder="Enter # Shares"
@@ -152,13 +160,6 @@ export default function Stock() {
                   name="costBasis"
                 />
                 <label htmlFor="costBasis">Cost Basis</label>
-                <input
-                  className="p-2"
-                  placeholder="Purchase Date"
-                  defaultValue={``}
-                  name="purchaseDate"
-                />
-                <label htmlFor="purchaseDate">Purchase Date</label>
                 <input
                   className="p-2"
                   placeholder="Brokerage"
@@ -178,9 +179,30 @@ export default function Stock() {
             </form>
           </div>
         )}
+        <button
+          onClick={() => setShowCalcDetails(!showCalcDetails)}
+          className="bg-gray-700"
+        >
+          {showCalcDetails ? (
+            <pre className="text-yellow-300 justify-center">
+              {JSON.stringify(stockInfo.calculations, null, 2)}
+            </pre>
+          ) : (
+            <div className="p-2">
+              <p className="text-yellow-300 text-3xl">
+                {stockInfo.calculations.stockCurrentValue}
+              </p>
+              <p className="text-yellow-300 text-2xl">{`${stockInfo.calculations.stockGainLoss} (${stockInfo.calculations.stockGainLossPercent})`}</p>
+            </div>
+          )}
+        </button>
+        <div className="flex flex-row justify-center">
+          <button className="m-4" onClick={() => setAdding(!adding)}>
+            {adding ? "Close" : "Add Holding"}
+          </button>
+        </div>
         {holdings.length > 0 ? (
-          <div>
-            <pre>{JSON.stringify(stockInfo.calculations, null, 2)}</pre>
+          <div className="flex flex-col justify-center">
             <table className="table-auto border-collapse m-2">
               <thead>
                 <tr>
@@ -219,9 +241,9 @@ export default function Stock() {
         <pre className="p-10 md:p-20">
           <code>{JSON.stringify(stockInfo, null, 2)}</code>
         </pre>
-      </div>
+      </Layout>
     );
   } else {
-    return <div>Getting info ...</div>;
+    return <Layout pageTitle="..." />;
   }
 }

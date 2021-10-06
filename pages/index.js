@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import Link from "next/link";
 
 import { AmplifyAuthenticator } from "@aws-amplify/ui-react";
 import {
@@ -11,10 +12,12 @@ import {
 
 import Head from "next/head";
 import awsExports from "../src/aws-exports";
+import Layout from "../src/components/layout";
 
 import {
   addStock as AddStock,
   deleteStock as DeleteStock,
+  updateStockData as UpdateStockData,
 } from "../src/graphql/mutations";
 
 import {
@@ -23,7 +26,6 @@ import {
   deleteHolding as DeleteHolding,
 } from "../src/graphql/queries";
 
-import calcHoldingTotals from "../src/utilities/calcHoldingTotals";
 import calcHoldingsTotals from "../src/utilities/calcHoldingsTotals";
 
 Amplify.configure({ ...awsExports, ssr: true });
@@ -104,30 +106,42 @@ export default function Home() {
       );
       setStocks(stocks.filter((stock) => stock.id !== id));
     } catch ({ errors }) {
-      console.log("ERRORS DELETING: ", ...errors);
+      console.log("ERRORS DELETING: ", errors);
       throw new Error(errors[0].message);
     }
   }
 
-  return (
-    <div>
-      <Head>
-        <title>Obsido | Home</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+  async function handleUpdateStock(id) {
+    const index = stocks.findIndex((s) => s.id === id);
+    const updatedStocks = [...stocks];
 
-      <main className="flex flex-col justify-center">
-        <div className="flex flex-row bg-black content-center">
-          <h2 className="flex-auto p-4 text-white text-2xl text-center">
-            Obsido
-          </h2>
-          <button
-            className="w-sm m-4 p-2 bg-green-600 text-white border-2 border-gray"
-            onClick={() => setShowAdd(!showAdd)}
-          >
-            {showAdd ? "Cancel" : "Add Stock"}
-          </button>
-        </div>
+    try {
+      const { data } = await API.graphql(
+        graphqlOperation(UpdateStockData, {
+          id: id,
+        })
+      );
+      updatedStocks[index] = data.updateStockData;
+      setStocks(updatedStocks);
+    } catch (err) {
+      console.log("ERRORS UPDATING: ", err);
+      if (err.errors) {
+        throw new Error(err.errors[0].message);
+      } else {
+        throw new Error(err);
+      }
+    }
+  }
+
+  return (
+    <Layout headTitle="Obsido | Home">
+      <div className="flex flex-col justify-center">
+        <button
+          className="w-sm m-4 p-2 bg-green-600 text-white border-2 border-gray"
+          onClick={() => setShowAdd(!showAdd)}
+        >
+          {showAdd ? "Cancel" : "Add Stock"}
+        </button>
         {showAdd && (
           <div className="flex flex-col justify-center bg-gray-300">
             <p className="text-center text-xl p-2">Add New Stock</p>
@@ -161,6 +175,7 @@ export default function Home() {
         <div>
           <pre>{JSON.stringify(totals, null, 2)}</pre>
         </div>
+        <div></div>
 
         <table className="table-auto border-collapse m-2">
           <thead>
@@ -173,6 +188,7 @@ export default function Home() {
               <th className="border">Gain/Loss</th>
               <th className="border">Cost Basis</th>
               <th className="border">Current Value</th>
+              <th className="border">Last Updated</th>
               <th className="border">Actions</th>
             </tr>
           </thead>
@@ -180,7 +196,11 @@ export default function Home() {
             {stocks.map((stock) => (
               <tr key={stock.id}>
                 <td className="border p-1">{stock.ticker}</td>
-                <td className="border p-1">{stock.ticker}</td>
+                <td className="border p-1">
+                  {stock.calculations
+                    ? stock.calculations.stockTotalShares
+                    : "No Holding"}
+                </td>
                 <td className="border p-1">{stock.overview.marketCap}</td>
                 <td className="border p-1">{stock.quote.price}</td>
                 <td className="border p-1">
@@ -204,13 +224,17 @@ export default function Home() {
                     ? stock.calculations.stockCurrentValue
                     : "No Holding"}
                 </td>
+                <td className="border p-1">{stock.updatedAt}</td>
                 <td className="flex flex-row gap-3 border p-1">
-                  <a
-                    className="p-1 text-center bg-green-400"
-                    href={`/stock/${stock.id}`}
+                  <Link href={`/stock/${encodeURIComponent(stock.id)}`}>
+                    <a className="p-1 text-center bg-green-400">view</a>
+                  </Link>
+                  <button
+                    className="p-1 text-center bg-gray-400"
+                    onClick={() => handleUpdateStock(stock.id)}
                   >
-                    view
-                  </a>
+                    update
+                  </button>
                   <button
                     className="p-1 text-center bg-red-400"
                     onClick={() => handleDeleteStock(stock.id)}
@@ -222,7 +246,7 @@ export default function Home() {
             ))}
           </tbody>
         </table>
-      </main>
-    </div>
+      </div>
+    </Layout>
   );
 }
