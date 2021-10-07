@@ -1,25 +1,25 @@
 import Head from "next/head";
 import Link from "next/link";
 
-export default function Layout({ children, headTitle, pageTitle, backLink }) {
+export default function Layout({ children, headTitle, pageTitle }) {
   return (
     <div>
       <Head>
         <title>{headTitle}</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main>
-        <div className="flex flex-row justify-center">
-          <div className="self-center p-2 m-2">
-            {backLink && (
-              <Link href={backLink}>
-                <a>{`< Back`}</a>
-              </Link>
-            )}
-          </div>
-          <h2 className="flex-auto p-4 text-2xl text-center">
-            {pageTitle ? pageTitle : "Obsido"}
+      <main className="flex flex-col w-auto">
+        <div className="flex flex-row">
+          <h2 className="flex-none text-2xl p-4">
+            <Link href="/">
+              <a>Obsido</a>
+            </Link>
           </h2>
+          {pageTitle && (
+            <div className="flex-grow p-4 gap-4">
+              {pageTitle}
+            </div>
+          )}
         </div>
         {children}
       </main>

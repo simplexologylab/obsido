@@ -189,29 +189,27 @@ export default function Home() {
         <table className="table-auto border-collapse m-2">
           <thead>
             <tr>
-              <th className="border">Ticker</th>
-              <th className="border">Shares Owned</th>
-              <th className="border">Market Cap</th>
-              <th className="border">Latest Price</th>
+              <th className="border">Stock</th>
               <th className="border">Holdings</th>
               <th className="border">Gain/Loss</th>
-              <th className="border">Cost Basis</th>
               <th className="border">Current Value</th>
-              <th className="border">Last Updated</th>
-              <th className="border">Actions</th>
             </tr>
           </thead>
           <tbody>
             {stocks.map((stock) => (
               <tr key={stock.id}>
-                <td className="border p-1">{stock.ticker}</td>
                 <td className="border p-1">
-                  {stock.calculations
-                    ? stock.calculations.stockTotalShares
-                    : "No Holding"}
+                  <div className="text-xl">
+                    <Link href={`/stock/${encodeURIComponent(stock.id)}`}>
+                      <a className="p-1 text-center bg-green-400">
+                        {stock.ticker}
+                      </a>
+                    </Link>
+                  </div>
+                  <div>{stock.quote.price}</div>
+                  <div>{stock.overview.marketCap}</div>
+                  <div className="text-xs">{stock.updatedAt}</div>
                 </td>
-                <td className="border p-1">{stock.overview.marketCap}</td>
-                <td className="border p-1">{stock.quote.price}</td>
                 <td className="border p-1">
                   {
                     holdings.filter((h) => h.stock.ticker === stock.ticker)
@@ -219,38 +217,44 @@ export default function Home() {
                   }
                 </td>
                 <td className="border p-1">
-                  {stock.calculations
-                    ? stock.calculations.stockGainLoss
-                    : "No Holding"}
+                  {stock.calculations ? (
+                    <div>
+                      <div>{stock.calculations.stockGainLoss}</div>
+                      <div>{stock.calculations.stockGainLossPercent}</div>
+                    </div>
+                  ) : (
+                    "No Holding"
+                  )}
                 </td>
                 <td className="border p-1">
-                  {stock.calculations
-                    ? stock.calculations.stockCostBasis
-                    : "No Holding"}
+                  {stock.calculations ? (
+                    <div>
+                      <div>{stock.calculations.stockCurrentValue}</div>
+                      <div>Insert % of Portfolio Here</div>
+                    </div>
+                  ) : (
+                    "No Holding"
+                  )}
                 </td>
-                <td className="border p-1">
-                  {stock.calculations
-                    ? stock.calculations.stockCurrentValue
-                    : "No Holding"}
-                </td>
-                <td className="border p-1">{stock.updatedAt}</td>
-                <td className="flex flex-row gap-3 border p-1">
-                  <Link href={`/stock/${encodeURIComponent(stock.id)}`}>
-                    <a className="p-1 text-center bg-green-400">view</a>
-                  </Link>
-                  <button
-                    className="p-1 text-center bg-gray-400"
-                    onClick={() => handleUpdateStock(stock.id)}
-                  >
-                    update
-                  </button>
-                  <button
-                    className="p-1 text-center bg-red-400"
-                    onClick={() => handleDeleteStock(stock.id)}
-                  >
-                    delete
-                  </button>
-                </td>
+                {/* <td className="border p-1">
+                  <div className="flex flex-col md:flex-row gap-2">
+                    <Link href={`/stock/${encodeURIComponent(stock.id)}`}>
+                      <a className="p-1 text-center bg-green-400">view</a>
+                    </Link>
+                    <button
+                      className="p-1 text-center bg-gray-400"
+                      onClick={() => handleUpdateStock(stock.id)}
+                    >
+                      update
+                    </button>
+                    <button
+                      className="p-1 text-center bg-red-400"
+                      onClick={() => handleDeleteStock(stock.id)}
+                    >
+                      delete
+                    </button>
+                  </div>
+                </td> */}
               </tr>
             ))}
           </tbody>

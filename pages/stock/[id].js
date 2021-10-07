@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-
 import { useRouter } from "next/router";
+
 import {
   Amplify,
   API,
@@ -179,23 +179,27 @@ export default function Stock() {
             </form>
           </div>
         )}
-        <button
-          onClick={() => setShowCalcDetails(!showCalcDetails)}
-          className="bg-gray-700 flex justify-center w-full"
-        >
-          {showCalcDetails ? (
-            <pre className="text-yellow-300">
-              {JSON.stringify(stockInfo.calculations, null, 2)}
-            </pre>
-          ) : (
-            <div className="p-2">
-              <p className="text-yellow-300 text-3xl">
-                {stockInfo.calculations.stockCurrentValue}
-              </p>
-              <p className="text-yellow-300 text-2xl">{`${stockInfo.calculations.stockGainLoss} (${stockInfo.calculations.stockGainLossPercent})`}</p>
-            </div>
-          )}
-        </button>
+        {stockInfo.calculations && (
+          <div>
+            <button
+              onClick={() => setShowCalcDetails(!showCalcDetails)}
+              className="bg-gray-700 flex justify-center w-full"
+            >
+              {showCalcDetails ? (
+                <pre className="text-yellow-300">
+                  {JSON.stringify(stockInfo.calculations, null, 2)}
+                </pre>
+              ) : (
+                <div className="p-2">
+                  <p className="text-yellow-300 text-3xl">
+                    {stockInfo.calculations.stockCurrentValue}
+                  </p>
+                  <p className="text-yellow-300 text-2xl">{`${stockInfo.calculations.stockGainLoss} (${stockInfo.calculations.stockGainLossPercent})`}</p>
+                </div>
+              )}
+            </button>
+          </div>
+        )}
         <div className="flex flex-row justify-center">
           <button className="m-4" onClick={() => setAdding(!adding)}>
             {adding ? "Close" : "Add Holding"}
@@ -236,11 +240,11 @@ export default function Stock() {
             </table>
           </div>
         ) : (
-          "No Holdings"
+          <div className="p-6">No Holdings</div>
         )}
-        <pre className="p-10 md:p-20">
+        {/* <pre className="p-10 md:p-20">
           <code>{JSON.stringify(stockInfo, null, 2)}</code>
-        </pre>
+        </pre> */}
       </Layout>
     );
   } else {
