@@ -239,7 +239,7 @@ export default function Home() {
                   <div>
                     <Link href={`/stock/${encodeURIComponent(stock.id)}`}>
                       <a className="p-1 bg-green-500 rounded-md text-lg lg:text-xl">
-                        {stock.ticker}
+                        {stock.ticker} | {stock.calculations.stockCostBasis}
                       </a>
                     </Link>
                   </div>

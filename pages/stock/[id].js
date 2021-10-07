@@ -12,6 +12,7 @@ import {
 import { getStock as GetStock } from "../../src/graphql/queries";
 import {
   updateStockData as UpdateStockData,
+  deleteStock as DeleteStock,
   createHolding as CreateHolding,
   deleteHolding as DeleteHolding,
 } from "../../src/graphql/mutations";
@@ -32,29 +33,40 @@ export default function Stock() {
   const [showCalcDetails, setShowCalcDetails] = useState(false);
 
   useEffect(() => {
-    async function updateStock() {
-      if (holdings.length === 0) {
-        const { data } = await API.graphql(
-          graphqlOperation(GetStock, {
-            id: id,
-          })
-        );
-        setStockInfo(data.getStock);
-        setHoldings(data.getStock.holdings.items);
-      } else {
-        const { data } = await API.graphql(
-          graphqlOperation(UpdateStockData, {
-            id: id,
-          })
-        );
-        setStockInfo(data.updateStockData);
-        setHoldings(data.updateStockData.holdings.items);
-      }
+    // async function updateStock() {
+    //   if (holdings.length === 0) {
+    //     const { data } = await API.graphql(
+    //       graphqlOperation(GetStock, {
+    //         id: id,
+    //       })
+    //     );
+    //     setStockInfo(data.getStock);
+    //     setHoldings(data.getStock.holdings.items);
+    //   } else {
+    //     const { data } = await API.graphql(
+    //       graphqlOperation(UpdateStockData, {
+    //         id: id,
+    //       })
+    //     );
+    //     setStockInfo(data.updateStockData);
+    //     setHoldings(data.updateStockData.holdings.items);
+    //   }
+
+    // }
+
+    async function getStockData() {
+      const { data } = await API.graphql(
+        graphqlOperation(GetStock, {
+          id: id,
+        })
+      );
+      setStockInfo(data.getStock);
+      setHoldings(data.getStock.holdings.items);
     }
 
     try {
       if (id) {
-        updateStock();
+        getStockData();
       } else {
         console.log("No ID!!!");
       }
@@ -64,20 +76,19 @@ export default function Stock() {
     }
   }, [id, holdings.length]);
 
-  // async function updateStockInfo() {
-  //   try {
-  //     const stockData = await API.graphql(
-  //       graphqlOperation(UpdateStockData, {
-  //         id: stockInfo.id,
-  //       })
-  //     );
-  //     console.log(stockData.data.updateStockData)
-  //     setStockInfo(stockData.data.updateStockData);
-  //   } catch ({ errors }) {
-  //     console.log("Errors: ", errors);
-  //     throw new Error(errors[0]);
-  //   }
-  // }
+  async function handleUpdateStock() {
+    try {
+      const stockData = await API.graphql(
+        graphqlOperation(UpdateStockData, {
+          id: stockInfo.id,
+        })
+      );
+      setStockInfo(stockData.data.updateStockData);
+    } catch ({ errors }) {
+      console.log("Errors: ", errors);
+      throw new Error(errors[0]);
+    }
+  }
 
   async function handleAddHolding(event) {
     event.preventDefault();
@@ -122,6 +133,22 @@ export default function Stock() {
     }
   }
 
+  async function handleDeleteStock(id) {
+    try {
+      const deleteItem = await API.graphql(
+        graphqlOperation(DeleteStock, {
+          input: {
+            id: id,
+          },
+        })
+      );
+      router.push("/");
+    } catch ({ errors }) {
+      console.log("ERRORS DELETING: ", errors);
+      throw new Error(errors[0].message);
+    }
+  }
+
   const currency = new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
@@ -135,50 +162,6 @@ export default function Stock() {
         className="flex flex-col justify-center"
         backLink="/"
       >
-        {adding && (
-          <div className="p-10 bg-gray-400">
-            <form onSubmit={handleAddHolding}>
-              <fieldset className="flex flex-col gap-3 p-10">
-                <input
-                  className="p-2"
-                  placeholder="Purchase Date"
-                  defaultValue={``}
-                  name="purchaseDate"
-                />
-                <label htmlFor="purchaseDate">Purchase Date</label>
-                <input
-                  className="p-2"
-                  placeholder="Enter # Shares"
-                  defaultValue={``}
-                  name="shares"
-                />
-                <label htmlFor="shares">Shares</label>
-                <input
-                  className="p-2"
-                  placeholder="Enter Cost Basis"
-                  defaultValue={``}
-                  name="costBasis"
-                />
-                <label htmlFor="costBasis">Cost Basis</label>
-                <input
-                  className="p-2"
-                  placeholder="Brokerage"
-                  defaultValue={``}
-                  name="brokerage"
-                />
-                <label htmlFor="brokerage">Brokerage</label>
-                <input
-                  className="p-2"
-                  placeholder="Notes"
-                  defaultValue={``}
-                  name="notes"
-                />
-                <label htmlFor="notes">Notes</label>
-              </fieldset>
-              <button className="border-2 p-2 bg-white">Add Holding</button>
-            </form>
-          </div>
-        )}
         {stockInfo.calculations && (
           <div>
             <button
@@ -200,11 +183,74 @@ export default function Stock() {
             </button>
           </div>
         )}
-        <div className="flex flex-row justify-center">
-          <button className="m-4" onClick={() => setAdding(!adding)}>
-            {adding ? "Close" : "Add Holding"}
-          </button>
-        </div>
+        <div>Last Updated: {stockInfo.updatedAt}</div>
+        {!adding && (
+          <div className="flex flex-row justify-between">
+            <button className="m-4" onClick={() => setAdding(!adding)}>
+              {adding ? "Close" : "Add Holding"}
+            </button>
+            <button
+              className="m-4"
+              onClick={() => handleUpdateStock(stockInfo.id)}
+            >
+              Update Stock
+            </button>
+            <button
+              className="m-4"
+              onClick={() => handleDeleteStock(stockInfo.id)}
+            >
+              Delete Stock
+            </button>
+          </div>
+        )}
+        {adding && (
+          <div className="p-4 bg-green-100">
+            <form onSubmit={handleAddHolding}>
+              <fieldset>
+                <div className="flex flex-col md:flex-row gap-4">
+                  <input
+                    className="p-2"
+                    placeholder="Purchase Date"
+                    defaultValue={``}
+                    name="purchaseDate"
+                  />
+                  <input
+                    className="p-2"
+                    placeholder="Enter # Shares"
+                    defaultValue={``}
+                    name="shares"
+                  />
+                  <input
+                    className="p-2"
+                    placeholder="Enter Cost Basis"
+                    defaultValue={``}
+                    name="costBasis"
+                  />
+                  <input
+                    className="p-2"
+                    placeholder="Brokerage"
+                    defaultValue={``}
+                    name="brokerage"
+                  />
+                </div>
+                <div className="m-4">
+                  <textarea
+                    className="p-2 resize w-full"
+                    placeholder="Notes"
+                    defaultValue={``}
+                    name="notes"
+                  />
+                </div>
+              </fieldset>
+              <div className="flex flex-row justify-between">
+                <button className="border-2 p-2 bg-white">Add Holding</button>
+                <button className="m-l-10" onClick={() => setAdding(!adding)}>
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
         {holdings.length > 0 ? (
           <div className="flex flex-col justify-center">
             <table className="table-auto border-collapse m-2">
