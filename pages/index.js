@@ -13,7 +13,12 @@ import {
 import awsExports from "../src/aws-exports";
 import Layout from "../src/components/layout";
 
-import { PlusCircleIcon, XCircleIcon } from "@heroicons/react/outline";
+import {
+  PlusCircleIcon,
+  XCircleIcon,
+  ChevronDoubleRightIcon,
+  MinusCircleIcon,
+} from "@heroicons/react/outline";
 
 import {
   addStock as AddStock,
@@ -138,22 +143,42 @@ export default function Home() {
   return (
     <Layout headTitle="Obsido | Home">
       <div className="flex flex-col justify-center">
-        <button
-          onClick={() => setShowDetails(!showDetails)}
-          className="bg-gray-700 flex justify-center w-full"
-        >
-          {showDetails ? (
-            <pre className="text-yellow-300">
-              {JSON.stringify(totals, null, 2)}
-            </pre>
-          ) : (
-            <div className="p-2">
-              <p className="text-yellow-300 text-3xl">{totals.currentValue}</p>
-              <p className="text-yellow-300 text-2xl">{`${totals.gainLoss} (${totals.overallPercent})`}</p>
+        {errors.length > 0 && (
+          <div className="flex flex-row align-middle justify-between gap-4 p-2 bg-red-600 text-white">
+            <div className="h-6 w-6 self-center">
+              <ChevronDoubleRightIcon />
             </div>
+            <pre>{JSON.stringify(errors, null, 2)}</pre>
+            <button
+              className="h-8 w-8 self-center"
+              onClick={() => setErrors([])}
+            >
+              <MinusCircleIcon />
+            </button>
+          </div>
+        )}
+        <div className="bg-gray-700 text-yellow-300 flex justify-center w-full">
+          {totals.shares > 0 ? (
+            <button
+              onClick={() => setShowDetails(!showDetails)}
+            >
+              {showDetails ? (
+                <pre className="">
+                  {JSON.stringify(totals, null, 2)}
+                </pre>
+              ) : (
+                <div className="p-2">
+                  <p className="text-3xl">
+                    {totals.currentValue}
+                  </p>
+                  <p className="text-2xl">{`${totals.gainLoss} (${totals.overallPercent})`}</p>
+                </div>
+              )}
+            </button>
+          ) : (
+            <div>Calculating ...</div>
           )}
-        </button>
-        {errors.length > 0 && <div>{JSON.stringify(errors, null, 2)}</div>}
+        </div>
         {!showAdd && (
           <div className="flex justify-end">
             <button
@@ -210,10 +235,10 @@ export default function Home() {
           <tbody>
             {stocks.map((stock) => (
               <tr key={stock.id}>
-                <td className="border p-1">
+                <td className="border p-2">
                   <div>
                     <Link href={`/stock/${encodeURIComponent(stock.id)}`}>
-                      <a className="p-1 text-green-500 underline text-xl">
+                      <a className="p-1 bg-green-500 rounded-md text-lg lg:text-xl">
                         {stock.ticker}
                       </a>
                     </Link>
@@ -222,7 +247,7 @@ export default function Home() {
                   <div>{stock.overview.marketCap}</div>
                   <div className="text-xs">{stock.updatedAt}</div>
                 </td>
-                <td className="border p-1">
+                <td className="border p-2">
                   {stock.calculations ? (
                     <div>
                       <span className="flex flex-row gap-2 align-bottom">
