@@ -9,7 +9,7 @@ export default function Layout({ children, headTitle, pageTitle, backLink }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <div className="flex bg-black justify-center">
+        <div className="flex flex-row bg-black justify-center">
           <div className="text-white self-center p-2 m-2">
             {backLink && (
               <Link href={backLink}>

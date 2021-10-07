@@ -10,7 +10,6 @@ import {
   graphqlOperation,
 } from "aws-amplify";
 
-import Head from "next/head";
 import awsExports from "../src/aws-exports";
 import Layout from "../src/components/layout";
 
