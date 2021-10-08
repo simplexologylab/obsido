@@ -6,7 +6,7 @@ export default function Layout({ children, headTitle, pageTitle }) {
     <div>
       <Head>
         <title>{headTitle}</title>
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/icon.png" />
       </Head>
       <main className="flex flex-col w-auto">
         <div className="flex flex-row justify-between">
