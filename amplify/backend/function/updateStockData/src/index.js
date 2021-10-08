@@ -72,10 +72,10 @@ const getStock = gql`
 `;
 
 function calcStockTotals(holdings, price) {
-  const currency = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-  });
+  // const currency = new Intl.NumberFormat("en-US", {
+  //   style: "currency",
+  //   currency: "USD",
+  // });
 
   let total = {
     shares: 0,
@@ -95,10 +95,10 @@ function calcStockTotals(holdings, price) {
   //   100
   // ).toFixed(3);
   total.gainLossPercent = (total.gainLoss / total.costBasis).toFixed(3);
-  total.average = currency.format(total.costBasis / total.shares);
-  total.costBasis = currency.format(total.costBasis);
-  total.gainLoss = currency.format(total.gainLoss);
-  total.currentValue = currency.format(total.shares * price);
+  total.average = total.costBasis / total.shares;
+  total.costBasis = total.costBasis;
+  total.gainLoss = total.gainLoss;
+  total.currentValue = total.shares * price;
 
   return total;
 }

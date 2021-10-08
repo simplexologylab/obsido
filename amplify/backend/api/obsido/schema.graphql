@@ -44,12 +44,12 @@ type Quote {
 }
 
 type Calculation {
-  stockTotalShares: String
-  stockCostBasis: String
-  stockGainLoss: String
-  stockCurrentValue: String
-  stockAvgPerShare: String
-  stockGainLossPercent: String
+  stockTotalShares: Float
+  stockCostBasis: Float
+  stockGainLoss: Float
+  stockCurrentValue: Float
+  stockAvgPerShare: Float
+  stockGainLossPercent: Float
 }
 
 type Query {

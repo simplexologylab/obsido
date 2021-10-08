@@ -22,15 +22,10 @@ import {
 
 import {
   addStock as AddStock,
-  deleteStock as DeleteStock,
   updateStockData as UpdateStockData,
 } from "../src/graphql/mutations";
 
-import {
-  listStocks,
-  listHoldings,
-  deleteHolding as DeleteHolding,
-} from "../src/graphql/queries";
+import { listStocks } from "../src/graphql/queries";
 
 import calcHoldingsTotals from "../src/utilities/calcHoldingsTotals";
 
@@ -51,7 +46,6 @@ export default function Home() {
   const [stocks, setStocks] = useState([]);
   const [showAdd, setShowAdd] = useState(false);
   const [errors, setErrors] = useState([]);
-  const [holdings, setHoldings] = useState([]);
   const [totals, setTotals] = useState({});
   const [showDetails, setShowDetails] = useState(false);
 
@@ -59,24 +53,24 @@ export default function Home() {
     async function getStocks() {
       try {
         const stockData = await API.graphql(graphqlOperation(listStocks));
-        const holdingData = await API.graphql(graphqlOperation(listHoldings));
-
-        setTotals(
-          calcHoldingsTotals(
-            holdingData.data.listHoldings.items,
-            stockData.data.listStocks.items
-          )
-        );
-
         setStocks(stockData.data.listStocks.items);
-        setHoldings(holdingData.data.listHoldings.items);
       } catch (err) {
+        console.log("error: ", err);
         setErrors([...errors, "Issue with API call to get list of stocks"]);
       }
     }
 
     getStocks();
   }, [errors]);
+
+  useEffect(() => {
+    setTotals(calcHoldingsTotals(stocks));
+  }, [stocks]);
+
+  const currency = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  });
 
   async function handleCreateStock(event) {
     event.preventDefault();
@@ -102,22 +96,6 @@ export default function Home() {
     }
   }
 
-  async function handleDeleteStock(id) {
-    try {
-      const deleteItem = await API.graphql(
-        graphqlOperation(DeleteStock, {
-          input: {
-            id: id,
-          },
-        })
-      );
-      setStocks(stocks.filter((stock) => stock.id !== id));
-    } catch ({ errors }) {
-      console.log("ERRORS DELETING: ", errors);
-      throw new Error(errors[0].message);
-    }
-  }
-
   async function handleUpdateStock(id) {
     const index = stocks.findIndex((s) => s.id === id);
     const updatedStocks = [...stocks];
@@ -128,6 +106,7 @@ export default function Home() {
           id: id,
         })
       );
+
       updatedStocks[index] = data.updateStockData;
       setStocks(updatedStocks);
     } catch (err) {
@@ -159,19 +138,13 @@ export default function Home() {
         )}
         <div className="bg-gray-700 text-yellow-300 flex justify-center w-full">
           {totals.shares > 0 ? (
-            <button
-              onClick={() => setShowDetails(!showDetails)}
-            >
+            <button onClick={() => setShowDetails(!showDetails)}>
               {showDetails ? (
-                <pre className="">
-                  {JSON.stringify(totals, null, 2)}
-                </pre>
+                <pre className="">{JSON.stringify(totals, null, 2)}</pre>
               ) : (
                 <div className="p-2">
-                  <p className="text-3xl">
-                    {totals.currentValue}
-                  </p>
-                  <p className="text-2xl">{`${totals.gainLoss} (${totals.overallPercent})`}</p>
+                  <p className="text-3xl">{currency.format(totals.currentValue)}</p>
+                  <p className="text-2xl">{`${currency.format(totals.gainLoss)} (${totals.overallPercent} %)`}</p>
                 </div>
               )}
             </button>
@@ -201,7 +174,6 @@ export default function Home() {
               </button>
             </div>
 
-            {/* <AmplifyAuthenticator> */}
             <form
               className="flex flex-row gap-2 align-middle justify-center p-2"
               onSubmit={handleCreateStock}
@@ -217,11 +189,7 @@ export default function Home() {
               <button className="bg-green-700 text-white p-2 rounded-sm">
                 Add Stock
               </button>
-              {/* <button type="button" onClick={() => Auth.signOut()}>
-                  Sign out
-                </button> */}
             </form>
-            {/* </AmplifyAuthenticator> */}
           </div>
         )}
         <table className="table-auto border-collapse m-2">
@@ -229,66 +197,63 @@ export default function Home() {
             <tr>
               <th className="border">Stock</th>
               <th className="border">Current Status</th>
-              {/* <th className="w-1/4 border">Indicators</th> */}
             </tr>
           </thead>
           <tbody>
             {stocks.map((stock) => (
               <tr key={stock.id}>
                 <td className="border p-2">
-                  <div>
-                    <Link href={`/stock/${encodeURIComponent(stock.id)}`}>
-                      <a className="p-1 bg-green-500 rounded-md text-lg lg:text-xl">
-                        {stock.ticker} | {stock.calculations.stockCostBasis}
-                      </a>
-                    </Link>
+                  <div className="flex flex-row justify-between">
+                    <div>
+                      <Link
+                        href={`/stock/${encodeURIComponent(stock.id)}`}
+                        passHref
+                      >
+                        <a>
+                          <div className="p-1 bg-green-500 rounded-md text-lg lg:text-xl w-full">
+                            {stock.ticker}
+                          </div>
+                        </a>
+                      </Link>
+                      <div>{currency.format(stock.quote.price)}</div>
+                      <div>{currency.format(stock.overview.marketCap)}</div>
+                      <div className="text-xs">{stock.updatedAt}</div>
+                    </div>
+                    <div>
+                      <button onClick={() => handleUpdateStock(stock.id)}>
+                        Update
+                      </button>
+                    </div>
                   </div>
-                  <div>{stock.quote.price}</div>
-                  <div>{stock.overview.marketCap}</div>
-                  <div className="text-xs">{stock.updatedAt}</div>
                 </td>
                 <td className="border p-2">
                   {stock.calculations ? (
                     <div>
                       <span className="flex flex-row gap-2 align-bottom">
                         <div className="text-xl">
-                          {stock.calculations.stockCurrentValue}
+                          {currency.format(
+                            stock.calculations.stockCurrentValue
+                          )}
                         </div>
-                        <span className="inline-block align-bottom">{`(${stock.calculations.stockGainLoss})`}</span>
+                        <span className="inline-block align-bottom">
+                          {currency.format(stock.calculations.stockGainLoss)}
+                        </span>
                       </span>
-                      <div>{stock.calculations.stockGainLossPercent}</div>
-                      <div>Insert % of Portfolio Here</div>
+                      <div>
+                        {`${(
+                          stock.calculations.stockGainLossPercent * 100
+                        ).toFixed(1)}%`}
+                      </div>
+                      <div>{`${(
+                        (stock.calculations.stockCurrentValue /
+                          totals.currentValue) *
+                        100
+                      ).toFixed(2)}% of Portfolio`}</div>
                     </div>
                   ) : (
                     "No Holding"
                   )}
                 </td>
-                {/* <td className="border p-1">
-                  {stock.calculations ? (
-                    <div>Hold for more ...</div>
-                  ) : (
-                    "No Holding"
-                  )}
-                </td> */}
-                {/* <td className="border p-1">
-                  <div className="flex flex-col md:flex-row gap-2">
-                    <Link href={`/stock/${encodeURIComponent(stock.id)}`}>
-                      <a className="p-1 text-center bg-green-400">view</a>
-                    </Link>
-                    <button
-                      className="p-1 text-center bg-gray-400"
-                      onClick={() => handleUpdateStock(stock.id)}
-                    >
-                      update
-                    </button>
-                    <button
-                      className="p-1 text-center bg-red-400"
-                      onClick={() => handleDeleteStock(stock.id)}
-                    >
-                      delete
-                    </button>
-                  </div>
-                </td> */}
               </tr>
             ))}
           </tbody>
