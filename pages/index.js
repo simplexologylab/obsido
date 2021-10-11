@@ -123,7 +123,6 @@ export default function Home() {
       if (s.name) {
         compare = compare + s.name.toUpperCase();
       }
-      console.log(compare);
       return compare.includes(event.target.value.toUpperCase());
     });
 
@@ -235,14 +234,20 @@ export default function Home() {
                 <div className="p-1 text-lg lg:text-xl w-full">
                   <div className="flex flex-row justify-between">
                     <p className="text-xl lg:text-2xl">{stock.ticker}</p>
-                    {stock.calculations.stockGainLossPercent >= 0 ? (
-                      <p className="bg-green-400 rounded-md text-lg md:text-xl font-bold p-1 w-1/4 md:w-40 text-center">{`${(
-                        stock.calculations.stockGainLossPercent * 100
-                      ).toFixed(1)}%`}</p>
+                    {stock.calculations ? (
+                      <div>
+                        {stock.calculations.stockGainLossPercent >= 0 ? (
+                          <p className="bg-green-400 rounded-md text-lg md:text-xl font-bold p-1 w-1/4 md:w-40 text-center">{`${(
+                            stock.calculations.stockGainLossPercent * 100
+                          ).toFixed(1)}%`}</p>
+                        ) : (
+                          <p className="bg-red-400 rounded-md text-lg md:text-xl font-bold p-1 w-1/4 md:w-40 text-center">{`${(
+                            stock.calculations.stockGainLossPercent * 100
+                          ).toFixed(1)}%`}</p>
+                        )}
+                      </div>
                     ) : (
-                      <p className="bg-red-400 rounded-md text-lg md:text-xl font-bold p-1 w-1/4 md:w-40 text-center">{`${(
-                        stock.calculations.stockGainLossPercent * 100
-                      ).toFixed(1)}%`}</p>
+                      <div>No Holdings</div>
                     )}
                   </div>
                 </div>

@@ -159,7 +159,7 @@ export default function Stock() {
     return (
       <Layout
         headTitle={`Obsido | ${stockInfo.ticker}`}
-        pageTitle={stockInfo.name}
+        pageTitle={stockInfo.name ? stockInfo.name : stockInfo.ticker}
         className="flex flex-col justify-center"
         backLink="/"
         kickOut={`https://finance.yahoo.com/chart/${stockInfo.ticker}`}
@@ -182,9 +182,9 @@ export default function Stock() {
                     </p>
                     <p className="text-yellow-300 text-2xl">{`${formatCurrency(
                       stockInfo.calculations.stockGainLoss
-                    )} (${
+                    )} (${(
                       stockInfo.calculations.stockGainLossPercent * 100
-                    }%)`}</p>
+                    ).toFixed(2)}%)`}</p>
                   </div>
                 )}
               </button>
@@ -295,9 +295,9 @@ export default function Stock() {
           ) : (
             <div className="p-6">No Holdings</div>
           )}
-          {/* <pre className="p-10 md:p-20">
-          <code>{JSON.stringify(stockInfo, null, 2)}</code>
-        </pre> */}
+          <pre className="p-10 md:p-20">
+            <code>{JSON.stringify(stockInfo, null, 2)}</code>
+          </pre>
         </div>
       </Layout>
     );
