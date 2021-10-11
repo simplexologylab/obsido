@@ -162,139 +162,143 @@ export default function Stock() {
         pageTitle={stockInfo.name}
         className="flex flex-col justify-center"
         backLink="/"
-        kickOut={`https://finance.yahoo.com/quote/${stockInfo.ticker}`}
+        kickOut={`https://finance.yahoo.com/chart/${stockInfo.ticker}`}
       >
-        {stockInfo.calculations && (
-          <div>
-            <button
-              onClick={() => setShowCalcDetails(!showCalcDetails)}
-              className="bg-gray-700 flex justify-center w-full"
-            >
-              {showCalcDetails ? (
-                <pre className="text-yellow-300">
-                  {JSON.stringify(stockInfo.calculations, null, 2)}
-                </pre>
-              ) : (
-                <div className="p-2">
-                  <p className="text-yellow-300 text-3xl">
-                    {formatCurrency(stockInfo.calculations.stockCurrentValue)}
-                  </p>
-                  <p className="text-yellow-300 text-2xl">{`${formatCurrency(
-                    stockInfo.calculations.stockGainLoss
-                  )} (${stockInfo.calculations.stockGainLossPercent * 100}%)`}</p>
+        <div className="font-primary">
+          {stockInfo.calculations && (
+            <div>
+              <button
+                onClick={() => setShowCalcDetails(!showCalcDetails)}
+                className="bg-gray-700 flex justify-center w-full"
+              >
+                {showCalcDetails ? (
+                  <pre className="text-yellow-300">
+                    {JSON.stringify(stockInfo.calculations, null, 2)}
+                  </pre>
+                ) : (
+                  <div className="p-2">
+                    <p className="text-yellow-300 text-3xl">
+                      {formatCurrency(stockInfo.calculations.stockCurrentValue)}
+                    </p>
+                    <p className="text-yellow-300 text-2xl">{`${formatCurrency(
+                      stockInfo.calculations.stockGainLoss
+                    )} (${
+                      stockInfo.calculations.stockGainLossPercent * 100
+                    }%)`}</p>
+                  </div>
+                )}
+              </button>
+            </div>
+          )}
+          {!adding && (
+            <div className="flex flex-row justify-between">
+              <button className="m-4" onClick={() => setAdding(!adding)}>
+                {adding ? "Close" : "Add Holding"}
+              </button>
+              <button
+                className="m-4"
+                onClick={() => handleUpdateStock(stockInfo.id)}
+              >
+                Update Stock
+              </button>
+              <button
+                className="m-4"
+                onClick={() => handleDeleteStock(stockInfo.id)}
+              >
+                Delete Stock
+              </button>
+            </div>
+          )}
+          {adding && (
+            <div className="p-4 bg-green-100">
+              <form onSubmit={handleAddHolding}>
+                <fieldset>
+                  <div className="flex flex-col md:flex-row gap-4">
+                    <input
+                      className="p-2"
+                      placeholder="Purchase Date"
+                      defaultValue={``}
+                      name="purchaseDate"
+                    />
+                    <input
+                      className="p-2"
+                      placeholder="Enter # Shares"
+                      defaultValue={``}
+                      name="shares"
+                    />
+                    <input
+                      className="p-2"
+                      placeholder="Enter Cost Basis"
+                      defaultValue={``}
+                      name="costBasis"
+                    />
+                    <input
+                      className="p-2"
+                      placeholder="Brokerage"
+                      defaultValue={``}
+                      name="brokerage"
+                    />
+                  </div>
+                  <div className="m-4">
+                    <textarea
+                      className="p-2 resize w-full"
+                      placeholder="Notes"
+                      defaultValue={``}
+                      name="notes"
+                    />
+                  </div>
+                </fieldset>
+                <div className="flex flex-row justify-between">
+                  <button className="border-2 p-2 bg-white">Add Holding</button>
+                  <button className="m-l-10" onClick={() => setAdding(!adding)}>
+                    Cancel
+                  </button>
                 </div>
-              )}
-            </button>
-          </div>
-        )}
-        <div>Last Updated: {stockInfo.updatedAt}</div>
-        {!adding && (
-          <div className="flex flex-row justify-between">
-            <button className="m-4" onClick={() => setAdding(!adding)}>
-              {adding ? "Close" : "Add Holding"}
-            </button>
-            <button
-              className="m-4"
-              onClick={() => handleUpdateStock(stockInfo.id)}
-            >
-              Update Stock
-            </button>
-            <button
-              className="m-4"
-              onClick={() => handleDeleteStock(stockInfo.id)}
-            >
-              Delete Stock
-            </button>
-          </div>
-        )}
-        {adding && (
-          <div className="p-4 bg-green-100">
-            <form onSubmit={handleAddHolding}>
-              <fieldset>
-                <div className="flex flex-col md:flex-row gap-4">
-                  <input
-                    className="p-2"
-                    placeholder="Purchase Date"
-                    defaultValue={``}
-                    name="purchaseDate"
-                  />
-                  <input
-                    className="p-2"
-                    placeholder="Enter # Shares"
-                    defaultValue={``}
-                    name="shares"
-                  />
-                  <input
-                    className="p-2"
-                    placeholder="Enter Cost Basis"
-                    defaultValue={``}
-                    name="costBasis"
-                  />
-                  <input
-                    className="p-2"
-                    placeholder="Brokerage"
-                    defaultValue={``}
-                    name="brokerage"
-                  />
-                </div>
-                <div className="m-4">
-                  <textarea
-                    className="p-2 resize w-full"
-                    placeholder="Notes"
-                    defaultValue={``}
-                    name="notes"
-                  />
-                </div>
-              </fieldset>
-              <div className="flex flex-row justify-between">
-                <button className="border-2 p-2 bg-white">Add Holding</button>
-                <button className="m-l-10" onClick={() => setAdding(!adding)}>
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-        )}
-        {holdings.length > 0 ? (
-          <div className="flex flex-col justify-center">
-            <table className="table-auto border-collapse m-2">
-              <thead>
-                <tr>
-                  <th className="border">Shares</th>
-                  <th className="border">Cost</th>
-                  <th className="border">Cost Basis</th>
-                  <th className="border">Purchase Date</th>
-                  <th className="border">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {holdings.map((holding) => (
-                  <tr key={holding.id}>
-                    <td className="border p-2">{holding.shares}</td>
-                    <td className="border p-2">
-                      {currency.format(holding.costBasis)}
-                    </td>
-                    <td className="border p-2">
-                      {currency.format(holding.costBasis * holding.shares)}
-                    </td>
-                    <td className="border p-2">{holding.purchaseDate}</td>
-                    <td className="border p-2">
-                      {" "}
-                      <button onClick={() => handleRemoveHolding(holding.id)}>
-                        delete
-                      </button>
-                    </td>
+              </form>
+            </div>
+          )}
+          {holdings.length > 0 ? (
+            <div className="flex flex-col justify-center">
+              <table className="table-auto border-collapse m-2">
+                <thead>
+                  <tr>
+                    <th className="border">Shares</th>
+                    <th className="border">Cost</th>
+                    <th className="border">Cost Basis</th>
+                    <th className="border">Purchase Date</th>
+                    <th className="border">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <div className="p-6">No Holdings</div>
-        )}
-        {/* <pre className="p-10 md:p-20">
+                </thead>
+                <tbody>
+                  {holdings.map((holding) => (
+                    <tr key={holding.id}>
+                      <td className="border p-2">{holding.shares}</td>
+                      <td className="border p-2">
+                        {currency.format(holding.costBasis)}
+                      </td>
+                      <td className="border p-2">
+                        {currency.format(holding.costBasis * holding.shares)}
+                      </td>
+                      <td className="border p-2">{holding.purchaseDate}</td>
+                      <td className="border p-2">
+                        {" "}
+                        <button onClick={() => handleRemoveHolding(holding.id)}>
+                          delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <div>Last Updated: {stockInfo.updatedAt}</div>
+            </div>
+          ) : (
+            <div className="p-6">No Holdings</div>
+          )}
+          {/* <pre className="p-10 md:p-20">
           <code>{JSON.stringify(stockInfo, null, 2)}</code>
         </pre> */}
+        </div>
       </Layout>
     );
   } else {

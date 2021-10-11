@@ -30,19 +30,22 @@ export default function Layout({
           )}
           {pageTitle ? (
             <div className="self-center">
-              <p className="text-lg md:text-2xl p-2 my-2">{pageTitle}</p>
+              <p className="font-primary text-xl md:text-2xl p-2 text-center">{pageTitle}</p>
             </div>
           ) : (
-            <div className="p-2">
-              <h2 className="text-xl md:text-2xl">Obsido</h2>
+            <div className="p-2 self-center">
+              <h2 className="font-primary text-3xl md:text-4xl">Obsido</h2>
             </div>
           )}
           {kickOut && (
-            <Link href={kickOut} passHref>
-              <a className="p-4 self-center">
-                <ExternalLinkIcon className="h-6 w-6" />
-              </a>
-            </Link>
+            <a
+              href={kickOut}
+              target="_blank"
+              className="p-4 self-center"
+              rel="noreferrer"
+            >
+              <ExternalLinkIcon className="h-6 w-6" />
+            </a>
           )}
         </div>
         {children}

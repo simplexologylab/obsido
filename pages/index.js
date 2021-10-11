@@ -14,7 +14,7 @@ import awsExports from "../src/aws-exports";
 import Layout from "../src/components/layout";
 
 import {
-  PlusCircleIcon,
+  PlusIcon,
   XCircleIcon,
   ChevronDoubleRightIcon,
   MinusCircleIcon,
@@ -45,7 +45,7 @@ export async function getServerSideProps({ req }) {
 
 export default function Home() {
   const [stocks, setStocks] = useState([]);
-  const [initial, setInitial] = useState([])
+  const [initial, setInitial] = useState([]);
   const [showAdd, setShowAdd] = useState(false);
   const [errors, setErrors] = useState([]);
   const [totals, setTotals] = useState({});
@@ -56,7 +56,7 @@ export default function Home() {
       try {
         const stockData = await API.graphql(graphqlOperation(listStocks));
         setStocks(stockData.data.listStocks.items);
-        setInitial(stockData.data.listStocks.items)
+        setInitial(stockData.data.listStocks.items);
       } catch (err) {
         console.log("error: ", err);
         setErrors([...errors, "Issue with API call to get list of stocks"]);
@@ -120,19 +120,19 @@ export default function Home() {
   function handleStockFilter(event) {
     const filtered = initial.filter((s) => {
       let compare = s.ticker.toUpperCase();
-      if(s.name) {
-        compare = compare + s.name.toUpperCase()
+      if (s.name) {
+        compare = compare + s.name.toUpperCase();
       }
       console.log(compare);
       return compare.includes(event.target.value.toUpperCase());
     });
 
-    setStocks(filtered)
+    setStocks(filtered);
   }
 
   return (
     <Layout headTitle="Obsido | Home">
-      <div className="flex flex-col justify-center">
+      <div className="flex flex-col justify-center font-primary">
         {errors.length > 0 && (
           <div className="flex flex-row align-middle justify-between gap-4 p-2 bg-red-600 text-white">
             <div className="h-6 w-6 self-center">
@@ -159,7 +159,7 @@ export default function Home() {
                   </p>
                   <p className="text-2xl">{`${formatCurrency(
                     totals.gainLoss
-                  )} (${totals.overallPercent} %)`}</p>
+                  )} (${totals.overallPercent}%)`}</p>
                 </div>
               )}
             </button>
@@ -169,20 +169,32 @@ export default function Home() {
         </div>
         {!showAdd && (
           <div className="flex flex-row justify-between">
-            <div className="m-2">
+            <form className="relative m-2 md:m-4 w-1/2 md:w-1/3">
+              <svg
+                width="20"
+                height="20"
+                fill="currentColor"
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+              >
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                />
+              </svg>
               <input
-                className="focus:border-light-blue-500 focus:ring-1 focus:ring-light-blue-500 focus:outline-none w-full text-sm text-black placeholder-gray-500 border border-gray-200 rounded-md py-2 pl-10"
+                className="focus:border-light-blue-500 focus:ring-1 focus:ring-light-blue-500 focus:outline-none w-full text-md text-black placeholder-gray-400 border border-green-200 rounded-md py-2 pl-10"
                 type="text"
                 aria-label="Filter stocks"
                 placeholder="Filter stocks"
                 onChange={handleStockFilter}
               />
-            </div>
+            </form>
             <button
               onClick={() => setShowAdd(true)}
-              className="w-10 h-10 text-green-600"
+              className="m-2 w-8 h-8 text-green-600 self-center"
             >
-              <PlusCircleIcon />
+              <PlusIcon />
             </button>
           </div>
         )}
@@ -216,7 +228,36 @@ export default function Home() {
             </form>
           </div>
         )}
-        <table className="table-auto border-collapse m-2">
+        {stocks.map((stock) => (
+          <div key={stock.id} className="px-2">
+            <Link href={`/stock/${encodeURIComponent(stock.id)}`} passHref>
+              <a>
+                <div className="p-1 text-lg lg:text-xl w-full">
+                  <div className="flex flex-row justify-between">
+                    <p className="text-xl lg:text-2xl">{stock.ticker}</p>
+                    {stock.calculations.stockGainLossPercent >= 0 ? (
+                      <p className="bg-green-400 rounded-md text-lg md:text-xl font-bold p-1 w-1/4 md:w-40 text-center">{`${(
+                        stock.calculations.stockGainLossPercent * 100
+                      ).toFixed(1)}%`}</p>
+                    ) : (
+                      <p className="bg-red-400 rounded-md text-lg md:text-xl font-bold p-1 w-1/4 md:w-40 text-center">{`${(
+                        stock.calculations.stockGainLossPercent * 100
+                      ).toFixed(1)}%`}</p>
+                    )}
+                  </div>
+                </div>
+              </a>
+            </Link>
+            <div className="flex flex-row justify-between">
+              <div className="text-xs">{stock.updatedAt}</div>
+              <button onClick={() => handleUpdateStock(stock.id)}>
+                Update
+              </button>
+            </div>
+          </div>
+        ))}
+
+        {/* <table className="table-auto border-collapse m-2">
           <thead>
             <tr>
               <th className="border">Stock</th>
@@ -233,14 +274,17 @@ export default function Home() {
                       passHref
                     >
                       <a>
-                        <div className="p-1 bg-green-500 rounded-md text-lg lg:text-xl w-full">
-                          {stock.ticker}
+                        <div className="p-1 bg-green-300 rounded-md text-lg lg:text-xl w-full">
+                          <div className="flex flex-row justify-between">
+                            <p className="text-lg lg:text-xl w-full">
+                              {stock.ticker}
+                            </p>
+                            <p>{formatCurrency(stock.quote.price)}</p>
+                          </div>
+                          <div className="text-xs">{stock.updatedAt}</div>
                         </div>
                       </a>
                     </Link>
-                    <div>{formatCurrency(stock.quote.price)}</div>
-                    <div>{formatCurrency(stock.overview.marketCap)}</div>
-                    <div className="text-xs">{stock.updatedAt}</div>
                     <button onClick={() => handleUpdateStock(stock.id)}>
                       Update
                     </button>
@@ -275,7 +319,7 @@ export default function Home() {
               </tr>
             ))}
           </tbody>
-        </table>
+        </table> */}
       </div>
     </Layout>
   );
