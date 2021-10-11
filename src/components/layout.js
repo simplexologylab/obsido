@@ -1,7 +1,18 @@
 import Head from "next/head";
 import Link from "next/link";
 
-export default function Layout({ children, headTitle, pageTitle }) {
+import {
+  ExternalLinkIcon,
+  ChevronDoubleLeftIcon,
+} from "@heroicons/react/outline";
+
+export default function Layout({
+  children,
+  headTitle,
+  pageTitle,
+  backLink,
+  kickOut,
+}) {
   return (
     <div>
       <Head>
@@ -10,17 +21,28 @@ export default function Layout({ children, headTitle, pageTitle }) {
       </Head>
       <main className="flex flex-col w-auto">
         <div className="flex flex-row justify-between">
-          <h2 className="flex-none text-2xl p-4">
-            <Link href="/">
-              <a>Obsido</a>
+          {backLink && (
+            <Link href={backLink} passHref>
+              <a className="p-4 self-center">
+                <ChevronDoubleLeftIcon className="h-6 w-6" />
+              </a>
             </Link>
-          </h2>
-          {pageTitle && (
-            <div className="">
-              <p className="text-2xl text-white bg-green-900 rounded-l-md p-2 my-2">
-                {pageTitle}
-              </p>
+          )}
+          {pageTitle ? (
+            <div className="self-center">
+              <p className="text-lg md:text-2xl p-2 my-2">{pageTitle}</p>
             </div>
+          ) : (
+            <div className="p-2">
+              <h2 className="text-xl md:text-2xl">Obsido</h2>
+            </div>
+          )}
+          {kickOut && (
+            <Link href={kickOut} passHref>
+              <a className="p-4 self-center">
+                <ExternalLinkIcon className="h-6 w-6" />
+              </a>
+            </Link>
           )}
         </div>
         {children}

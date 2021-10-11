@@ -18,6 +18,7 @@ import {
 } from "../../src/graphql/mutations";
 
 import Layout from "../../src/components/layout";
+import { formatCurrency } from "../../src/utilities/textFormatting";
 
 import awsExports from "../../src/aws-exports";
 
@@ -161,6 +162,7 @@ export default function Stock() {
         pageTitle={stockInfo.name}
         className="flex flex-col justify-center"
         backLink="/"
+        kickOut={`https://finance.yahoo.com/quote/${stockInfo.ticker}`}
       >
         {stockInfo.calculations && (
           <div>
@@ -175,9 +177,11 @@ export default function Stock() {
               ) : (
                 <div className="p-2">
                   <p className="text-yellow-300 text-3xl">
-                    {stockInfo.calculations.stockCurrentValue}
+                    {formatCurrency(stockInfo.calculations.stockCurrentValue)}
                   </p>
-                  <p className="text-yellow-300 text-2xl">{`${stockInfo.calculations.stockGainLoss} (${stockInfo.calculations.stockGainLossPercent})`}</p>
+                  <p className="text-yellow-300 text-2xl">{`${formatCurrency(
+                    stockInfo.calculations.stockGainLoss
+                  )} (${stockInfo.calculations.stockGainLossPercent * 100}%)`}</p>
                 </div>
               )}
             </button>

@@ -28,6 +28,7 @@ import {
 import { listStocks } from "../src/graphql/queries";
 
 import calcHoldingsTotals from "../src/utilities/calcHoldingsTotals";
+import { formatCurrency } from "../src/utilities/textFormatting";
 
 Amplify.configure({ ...awsExports, ssr: true });
 
@@ -44,6 +45,7 @@ export async function getServerSideProps({ req }) {
 
 export default function Home() {
   const [stocks, setStocks] = useState([]);
+  const [initial, setInitial] = useState([])
   const [showAdd, setShowAdd] = useState(false);
   const [errors, setErrors] = useState([]);
   const [totals, setTotals] = useState({});
@@ -54,6 +56,7 @@ export default function Home() {
       try {
         const stockData = await API.graphql(graphqlOperation(listStocks));
         setStocks(stockData.data.listStocks.items);
+        setInitial(stockData.data.listStocks.items)
       } catch (err) {
         console.log("error: ", err);
         setErrors([...errors, "Issue with API call to get list of stocks"]);
@@ -66,11 +69,6 @@ export default function Home() {
   useEffect(() => {
     setTotals(calcHoldingsTotals(stocks));
   }, [stocks]);
-
-  const currency = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-  });
 
   async function handleCreateStock(event) {
     event.preventDefault();
@@ -119,6 +117,19 @@ export default function Home() {
     }
   }
 
+  function handleStockFilter(event) {
+    const filtered = initial.filter((s) => {
+      let compare = s.ticker.toUpperCase();
+      if(s.name) {
+        compare = compare + s.name.toUpperCase()
+      }
+      console.log(compare);
+      return compare.includes(event.target.value.toUpperCase());
+    });
+
+    setStocks(filtered)
+  }
+
   return (
     <Layout headTitle="Obsido | Home">
       <div className="flex flex-col justify-center">
@@ -143,8 +154,12 @@ export default function Home() {
                 <pre className="">{JSON.stringify(totals, null, 2)}</pre>
               ) : (
                 <div className="p-2">
-                  <p className="text-3xl">{currency.format(totals.currentValue)}</p>
-                  <p className="text-2xl">{`${currency.format(totals.gainLoss)} (${totals.overallPercent} %)`}</p>
+                  <p className="text-3xl">
+                    {formatCurrency(totals.currentValue)}
+                  </p>
+                  <p className="text-2xl">{`${formatCurrency(
+                    totals.gainLoss
+                  )} (${totals.overallPercent} %)`}</p>
                 </div>
               )}
             </button>
@@ -153,7 +168,16 @@ export default function Home() {
           )}
         </div>
         {!showAdd && (
-          <div className="flex justify-end">
+          <div className="flex flex-row justify-between">
+            <div className="m-2">
+              <input
+                className="focus:border-light-blue-500 focus:ring-1 focus:ring-light-blue-500 focus:outline-none w-full text-sm text-black placeholder-gray-500 border border-gray-200 rounded-md py-2 pl-10"
+                type="text"
+                aria-label="Filter stocks"
+                placeholder="Filter stocks"
+                onChange={handleStockFilter}
+              />
+            </div>
             <button
               onClick={() => setShowAdd(true)}
               className="w-10 h-10 text-green-600"
@@ -203,27 +227,23 @@ export default function Home() {
             {stocks.map((stock) => (
               <tr key={stock.id}>
                 <td className="border p-2">
-                  <div className="flex flex-row justify-between">
-                    <div>
-                      <Link
-                        href={`/stock/${encodeURIComponent(stock.id)}`}
-                        passHref
-                      >
-                        <a>
-                          <div className="p-1 bg-green-500 rounded-md text-lg lg:text-xl w-full">
-                            {stock.ticker}
-                          </div>
-                        </a>
-                      </Link>
-                      <div>{currency.format(stock.quote.price)}</div>
-                      <div>{currency.format(stock.overview.marketCap)}</div>
-                      <div className="text-xs">{stock.updatedAt}</div>
-                    </div>
-                    <div>
-                      <button onClick={() => handleUpdateStock(stock.id)}>
-                        Update
-                      </button>
-                    </div>
+                  <div>
+                    <Link
+                      href={`/stock/${encodeURIComponent(stock.id)}`}
+                      passHref
+                    >
+                      <a>
+                        <div className="p-1 bg-green-500 rounded-md text-lg lg:text-xl w-full">
+                          {stock.ticker}
+                        </div>
+                      </a>
+                    </Link>
+                    <div>{formatCurrency(stock.quote.price)}</div>
+                    <div>{formatCurrency(stock.overview.marketCap)}</div>
+                    <div className="text-xs">{stock.updatedAt}</div>
+                    <button onClick={() => handleUpdateStock(stock.id)}>
+                      Update
+                    </button>
                   </div>
                 </td>
                 <td className="border p-2">
@@ -231,12 +251,10 @@ export default function Home() {
                     <div>
                       <span className="flex flex-row gap-2 align-bottom">
                         <div className="text-xl">
-                          {currency.format(
-                            stock.calculations.stockCurrentValue
-                          )}
+                          {formatCurrency(stock.calculations.stockCurrentValue)}
                         </div>
                         <span className="inline-block align-bottom">
-                          {currency.format(stock.calculations.stockGainLoss)}
+                          {formatCurrency(stock.calculations.stockGainLoss)}
                         </span>
                       </span>
                       <div>
