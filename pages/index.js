@@ -237,11 +237,11 @@ export default function Home() {
                     {stock.calculations ? (
                       <div>
                         {stock.calculations.stockGainLossPercent >= 0 ? (
-                          <p className="bg-green-400 rounded-md text-lg md:text-xl font-bold p-1 w-1/4 md:w-40 text-center">{`${(
+                          <p className="bg-green-400 rounded-md text-lg md:text-xl font-bold p-1 w-36 text-center">{`${(
                             stock.calculations.stockGainLossPercent * 100
                           ).toFixed(1)}%`}</p>
                         ) : (
-                          <p className="bg-red-400 rounded-md text-lg md:text-xl font-bold p-1 w-1/4 md:w-40 text-center">{`${(
+                          <p className="bg-red-400 rounded-md text-lg md:text-xl font-bold p-1 w-36 text-center">{`${(
                             stock.calculations.stockGainLossPercent * 100
                           ).toFixed(1)}%`}</p>
                         )}
