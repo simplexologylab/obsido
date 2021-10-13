@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "api": {
+      "obsido": [
+        "Query",
+        "Mutation"
+      ]
+    },
+    "function": {
+      "updateStockData": [
+        "read",
+        "update"
+      ]
+    }
+  },
+  "lambdaLayers": []
+}

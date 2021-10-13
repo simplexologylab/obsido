@@ -29,6 +29,7 @@ export const addStock = /* GraphQL */ `
         change
         changePercent
       }
+      type
       holdings {
         items {
           id
@@ -84,6 +85,7 @@ export const updateStockData = /* GraphQL */ `
         change
         changePercent
       }
+      type
       holdings {
         items {
           id
@@ -109,6 +111,11 @@ export const updateStockData = /* GraphQL */ `
       createdAt
       updatedAt
     }
+  }
+`;
+export const updateAll = /* GraphQL */ `
+  mutation UpdateAll {
+    updateAll
   }
 `;
 export const createStock = /* GraphQL */ `
@@ -142,6 +149,7 @@ export const createStock = /* GraphQL */ `
         change
         changePercent
       }
+      type
       holdings {
         items {
           id
@@ -200,6 +208,7 @@ export const updateStock = /* GraphQL */ `
         change
         changePercent
       }
+      type
       holdings {
         items {
           id
@@ -258,6 +267,7 @@ export const deleteStock = /* GraphQL */ `
         change
         changePercent
       }
+      type
       holdings {
         items {
           id
@@ -324,6 +334,7 @@ export const createHolding = /* GraphQL */ `
           change
           changePercent
         }
+        type
         holdings {
           nextToken
         }
@@ -382,6 +393,7 @@ export const updateHolding = /* GraphQL */ `
           change
           changePercent
         }
+        type
         holdings {
           nextToken
         }
@@ -440,6 +452,7 @@ export const deleteHolding = /* GraphQL */ `
           change
           changePercent
         }
+        type
         holdings {
           nextToken
         }

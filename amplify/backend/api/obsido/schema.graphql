@@ -1,20 +1,34 @@
-type Stock @model {
+type Stock
+  @model
+  @key(
+    name: "byUpdatedAt"
+    fields: ["type", "updatedAt"]
+    queryField: "stocksByUpdatedAt"
+  ) {
   id: ID!
   name: String
   ticker: String!
   overview: Overview
   quote: Quote
+  type: StockType
   holdings: [Holding] @connection(name: "StockHoldings")
   calculations: Calculation
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
 }
 
-type Holding @model{
+enum StockType {
+  Stock
+  Fund
+}
+
+type Holding @model {
   id: ID!
   shares: Float!
   costBasis: Float!
   purchaseDate: AWSDate!
   brokerage: String!
-  soldDate:AWSDate
+  soldDate: AWSDate
   notes: String
   stock: Stock @connection(name: "StockHoldings")
 }
@@ -60,4 +74,5 @@ type Query {
 type Mutation {
   addStock(ticker: String): Stock! @function(name: "addStock-${env}")
   updateStockData(id: String): Stock! @function(name: "updateStockData-${env}")
+  updateAll: String @function(name: "updateAll-${env}")
 }

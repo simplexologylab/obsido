@@ -39,6 +39,7 @@ export const getStock = /* GraphQL */ `
         change
         changePercent
       }
+      type
       holdings {
         items {
           id
@@ -99,6 +100,7 @@ export const listStocks = /* GraphQL */ `
           change
           changePercent
         }
+        type
         holdings {
           nextToken
         }
@@ -153,6 +155,7 @@ export const getHolding = /* GraphQL */ `
           change
           changePercent
         }
+        type
         holdings {
           nextToken
         }
@@ -191,8 +194,71 @@ export const listHoldings = /* GraphQL */ `
           id
           name
           ticker
+          type
           createdAt
           updatedAt
+        }
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;
+export const stocksByUpdatedAt = /* GraphQL */ `
+  query StocksByUpdatedAt(
+    $type: StockType
+    $updatedAt: ModelStringKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelStockFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    stocksByUpdatedAt(
+      type: $type
+      updatedAt: $updatedAt
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        name
+        ticker
+        overview {
+          exchange
+          currency
+          description
+          sector
+          marketCap
+          dividendYield
+          last52High
+          last52Low
+          dma50
+          dma200
+        }
+        quote {
+          open
+          high
+          low
+          price
+          volume
+          prevClose
+          change
+          changePercent
+        }
+        type
+        holdings {
+          nextToken
+        }
+        calculations {
+          stockTotalShares
+          stockCostBasis
+          stockGainLoss
+          stockCurrentValue
+          stockAvgPerShare
+          stockGainLossPercent
         }
         createdAt
         updatedAt

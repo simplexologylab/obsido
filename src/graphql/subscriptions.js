@@ -29,6 +29,7 @@ export const onCreateStock = /* GraphQL */ `
         change
         changePercent
       }
+      type
       holdings {
         items {
           id
@@ -84,6 +85,7 @@ export const onUpdateStock = /* GraphQL */ `
         change
         changePercent
       }
+      type
       holdings {
         items {
           id
@@ -139,6 +141,7 @@ export const onDeleteStock = /* GraphQL */ `
         change
         changePercent
       }
+      type
       holdings {
         items {
           id
@@ -202,6 +205,7 @@ export const onCreateHolding = /* GraphQL */ `
           change
           changePercent
         }
+        type
         holdings {
           nextToken
         }
@@ -257,6 +261,7 @@ export const onUpdateHolding = /* GraphQL */ `
           change
           changePercent
         }
+        type
         holdings {
           nextToken
         }
@@ -312,6 +317,7 @@ export const onDeleteHolding = /* GraphQL */ `
           change
           changePercent
         }
+        type
         holdings {
           nextToken
         }

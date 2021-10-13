@@ -23,6 +23,7 @@ import {
 import {
   addStock as AddStock,
   updateStockData as UpdateStockData,
+  updateAll as UpdateAll,
 } from "../src/graphql/mutations";
 
 import { listStocks } from "../src/graphql/queries";
@@ -117,6 +118,18 @@ export default function Home() {
     }
   }
 
+  async function handleUpdateAll() {
+    try {
+      const data = await API.graphql(
+        graphqlOperation(UpdateAll)
+      );
+        console.log('Here')
+      console.log("Data >>> ", data);
+    } catch (err) {
+      throw new Error(err);
+    }
+  }
+
   function handleStockFilter(event) {
     const filtered = initial.filter((s) => {
       let compare = s.ticker.toUpperCase();
@@ -146,6 +159,9 @@ export default function Home() {
             </button>
           </div>
         )}
+        <div className="bg-yellow-300">
+          <button onClick={() => handleUpdateAll()}>Update Latest</button>
+        </div>
         <div className="bg-gray-700 text-yellow-300 flex justify-center w-full">
           {totals.shares > 0 ? (
             <button onClick={() => setShowDetails(!showDetails)}>

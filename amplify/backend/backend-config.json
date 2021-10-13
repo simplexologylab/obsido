@@ -49,6 +49,29 @@
           ]
         }
       ]
+    },
+    "updateAll": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda",
+      "dependsOn": [
+        {
+          "category": "api",
+          "resourceName": "obsido",
+          "attributes": [
+            "GraphQLAPIIdOutput",
+            "GraphQLAPIEndpointOutput",
+            "GraphQLAPIKeyOutput"
+          ]
+        },
+        {
+          "category": "function",
+          "resourceName": "updateStockData",
+          "attributes": [
+            "Name"
+          ]
+        }
+      ]
     }
   }
 }

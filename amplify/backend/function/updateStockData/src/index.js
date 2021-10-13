@@ -124,6 +124,8 @@ function removeSpaceFromApiKeys(apiKeyValue) {
 
 exports.handler = async (event) => {
   try {
+    console.log(">>> Event Arguments >>> ", event.arguments)
+
     const currentStock = await axios({
       url: process.env.API_OBSIDO_GRAPHQLAPIENDPOINTOUTPUT,
       method: "post",
