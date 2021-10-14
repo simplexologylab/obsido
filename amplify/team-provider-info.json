@@ -19,11 +19,11 @@
         },
         "updateStockData": {
           "deploymentBucketName": "amplify-obsido-dev-75210-deployment",
-          "s3Key": "amplify-builds/updateStockData-3650586a556f52362b55-build.zip"
+          "s3Key": "amplify-builds/updateStockData-71624b6751437268386e-build.zip"
         },
         "updateAll": {
           "deploymentBucketName": "amplify-obsido-dev-75210-deployment",
-          "s3Key": "amplify-builds/updateAll-6f6b35683075685a326a-build.zip"
+          "s3Key": "amplify-builds/updateAll-574255316d786d702f53-build.zip"
         }
       }
     }

@@ -13,7 +13,7 @@ const graphql = require("graphql");
 const { print } = graphql;
 
 const updateStockData = gql`
-  mutation updateStockData($id: String!) {
+  mutation updateStockData($id: String) {
     updateStockData(id: $id) {
       id
       ticker
@@ -70,7 +70,9 @@ exports.handler = async (event) => {
       },
     });
 
-    return update.data
+    console.log(">>> Updated: ", data.data.stocksByUpdatedAt.items[0])
+    console.log(">>> Update was: ", update)
+
   } catch (err) {
     console.log(">>> ERROR >>> ", err);
     throw new Error(err);

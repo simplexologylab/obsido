@@ -71,6 +71,29 @@ const getStock = gql`
   }
 `;
 
+const sortedStocks = gql`
+  query stocksByUpdatedAt(
+    $type: StockType!
+    $sortDirection: ModelSortDirection!
+  ) {
+    stocksByUpdatedAt(type: $type, sortDirection: $sortDirection) {
+      items {
+        id
+        ticker
+        holdings {
+          items {
+            id
+            purchaseDate
+            shares
+            costBasis
+          }
+        }
+        updatedAt
+      }
+    }
+  }
+`;
+
 function calcStockTotals(holdings, price) {
   // const currency = new Intl.NumberFormat("en-US", {
   //   style: "currency",
@@ -124,32 +147,68 @@ function removeSpaceFromApiKeys(apiKeyValue) {
 
 exports.handler = async (event) => {
   try {
-    console.log(">>> Event Arguments >>> ", event.arguments)
+    console.log(">>> Event Arguments >>> ", event.arguments);
+    let ticker = ''
+    let id = ''
+    if (event.arguments) {
+      id = event.arguments.id
+    }
+    let holdings = []
 
-    const currentStock = await axios({
-      url: process.env.API_OBSIDO_GRAPHQLAPIENDPOINTOUTPUT,
-      method: "post",
-      headers: {
-        "x-api-key": process.env.API_OBSIDO_GRAPHQLAPIKEYOUTPUT,
-      },
-      data: {
-        query: print(getStock),
-        variables: {
-          id: event.arguments.id,
+    if (id) {
+      console.log(">>> Called with ID: ", id)
+      const currentStock = await axios({
+        url: process.env.API_OBSIDO_GRAPHQLAPIENDPOINTOUTPUT,
+        method: "post",
+        headers: {
+          "x-api-key": process.env.API_OBSIDO_GRAPHQLAPIKEYOUTPUT,
         },
-      },
-    });
+        data: {
+          query: print(getStock),
+          variables: {
+            id: event.arguments.id,
+          },
+        },
+      });
 
-    console.log(">> Current Stock is: ", currentStock.data.data.getStock);
+      console.log('Need to get ticker for: ', currentStock.data.data)
+
+      ticker = currentStock.data.data.getStock.ticker
+      holdings = currentStock.data.data.getStock.holdings
+    } else {
+      console.log(">>> Called without ID!!!")
+      const { data } = await axios({
+        url: process.env.API_OBSIDO_GRAPHQLAPIENDPOINTOUTPUT,
+        method: "post",
+        headers: {
+          "x-api-key": process.env.API_OBSIDO_GRAPHQLAPIKEYOUTPUT,
+        },
+        data: {
+          query: print(sortedStocks),
+          variables: {
+            type: "Stock",
+            sortDirection: "ASC",
+          },
+        },
+      });
+
+      console.log('>>> Need to update this: ', data.data.stocksByUpdatedAt.items[0])
+
+      id = data.data.stocksByUpdatedAt.items[0].id
+      ticker = data.data.stocksByUpdatedAt.items[0].ticker
+      holdings = data.data.stocksByUpdatedAt.items[0].holdings
+
+      console.log('>>> set id & ticker & holdings >>>', id, ticker, holdings)
+    }
 
     const stockData = await axios({
       method: "get",
-      url: `https://www.alphavantage.co/query?function=OVERVIEW&symbol=${currentStock.data.data.getStock.ticker}&apikey=6GUGOE51J9KLH0O2`,
+      url: `https://www.alphavantage.co/query?function=OVERVIEW&symbol=${ticker}&apikey=6GUGOE51J9KLH0O2`,
     });
 
     const quoteData = await axios({
       method: "get",
-      url: `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${currentStock.data.data.getStock.ticker}&apikey=6GUGOE51J9KLH0O2`,
+      url: `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${ticker}&apikey=6GUGOE51J9KLH0O2`,
     });
 
     const formattedQuoteData = removeSpaceFromApiKeys(quoteData.data);
@@ -164,7 +223,7 @@ exports.handler = async (event) => {
         query: print(updateStock),
         variables: {
           input: {
-            id: event.arguments.id,
+            id: id,
             overview: {
               exchange: stockData.data.Exchange,
               currency: stockData.data.Currency,
@@ -189,36 +248,38 @@ exports.handler = async (event) => {
             },
             calculations: {
               stockTotalShares: calcStockTotals(
-                currentStock.data.data.getStock.holdings.items,
-                currentStock.data.data.getStock.quote.price
+                holdings.items,
+                formattedQuoteData.GlobalQuote["05.price"]
               ).shares,
               stockCostBasis: calcStockTotals(
-                currentStock.data.data.getStock.holdings.items,
-                currentStock.data.data.getStock.quote.price
+                holdings.items,
+                formattedQuoteData.GlobalQuote["05.price"]
               ).costBasis,
               stockGainLoss: calcStockTotals(
-                currentStock.data.data.getStock.holdings.items,
-                currentStock.data.data.getStock.quote.price
+                holdings.items,
+                formattedQuoteData.GlobalQuote["05.price"]
               ).gainLoss,
               stockCurrentValue: calcStockTotals(
-                currentStock.data.data.getStock.holdings.items,
-                currentStock.data.data.getStock.quote.price
+                holdings.items,
+                formattedQuoteData.GlobalQuote["05.price"]
               ).currentValue,
               stockAvgPerShare: calcStockTotals(
-                currentStock.data.data.getStock.holdings.items,
-                currentStock.data.data.getStock.quote.price
+               holdings.items,
+                formattedQuoteData.GlobalQuote["05.price"]
               ).average,
               stockGainLossPercent: calcStockTotals(
-                currentStock.data.data.getStock.holdings.items,
-                currentStock.data.data.getStock.quote.price
+                holdings.items,
+                formattedQuoteData.GlobalQuote["05.price"]
               ).gainLossPercent,
             },
           },
         },
       },
     });
+    console.log(">>> Returned update: ", update.data.data.updateStock);
     return update.data.data.updateStock;
   } catch (err) {
+    console.log(">>> Error in updateStockData", err);
     throw new Error(err);
   }
 };

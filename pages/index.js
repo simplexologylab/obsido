@@ -121,7 +121,7 @@ export default function Home() {
   async function handleUpdateAll() {
     try {
       const data = await API.graphql(
-        graphqlOperation(UpdateAll)
+        graphqlOperation(UpdateStockData)
       );
         console.log('Here')
       console.log("Data >>> ", data);
