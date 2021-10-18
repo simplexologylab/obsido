@@ -18,6 +18,7 @@ import {
 } from "../../src/graphql/mutations";
 
 import Layout from "../../src/components/layout";
+import PriceRange from "../../src/components/price-range";
 import { formatCurrency } from "../../src/utilities/textFormatting";
 
 import awsExports from "../../src/aws-exports";
@@ -165,6 +166,18 @@ export default function Stock() {
         kickOut={`https://finance.yahoo.com/chart/${stockInfo.ticker}`}
       >
         <div className="font-primary">
+          <div className="w-full p-2 bg-black text-white">
+            <div className="">
+              <p className="text-3xl">{stockInfo.quote.price}</p>
+            </div>
+            <PriceRange
+              low={stockInfo.overview.last52Low}
+              price={stockInfo.quote.price}
+              high={stockInfo.overview.last52High}
+              id={stockInfo.id}
+            />
+            <p className="text-sm">As of: {stockInfo.updatedAt}</p>
+          </div>
           {stockInfo.calculations && (
             <div>
               <button
@@ -290,14 +303,14 @@ export default function Stock() {
                   ))}
                 </tbody>
               </table>
-              <div>Last Updated: {stockInfo.updatedAt}</div>
             </div>
           ) : (
             <div className="p-6">No Holdings</div>
           )}
+{/* 
           <pre className="p-10 md:p-20">
             <code>{JSON.stringify(stockInfo, null, 2)}</code>
-          </pre>
+          </pre> */}
         </div>
       </Layout>
     );
