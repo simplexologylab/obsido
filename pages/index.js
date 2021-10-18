@@ -23,7 +23,7 @@ import {
 import {
   addStock as AddStock,
   updateStockData as UpdateStockData,
-  updateAll as UpdateAll,
+  stockCleanup as StockCleanup,
 } from "../src/graphql/mutations";
 
 import { listStocks } from "../src/graphql/queries";
@@ -118,17 +118,14 @@ export default function Home() {
     }
   }
 
-  async function handleUpdateAll() {
-    try {
-      const data = await API.graphql(
-        graphqlOperation(UpdateStockData)
-      );
-        console.log('Here')
-      console.log("Data >>> ", data);
-    } catch (err) {
-      throw new Error(err);
-    }
-  }
+  // async function handleCleanup() {
+  //   try {
+  //     const data = await API.graphql(graphqlOperation(StockCleanup));
+  //     console.log('function returned: ', data)
+  //   } catch (err) {
+  //     throw new Error(err);
+  //   }
+  // }
 
   function handleStockFilter(event) {
     const filtered = initial.filter((s) => {
@@ -159,9 +156,9 @@ export default function Home() {
             </button>
           </div>
         )}
-        <div className="bg-yellow-300">
-          <button onClick={() => handleUpdateAll()}>Update Latest</button>
-        </div>
+        {/* <div className="bg-yellow-600">
+          <button onClick={() => handleCleanup()}>Update Latest</button>
+        </div> */}
         <div className="bg-gray-700 text-yellow-300 flex justify-center w-full">
           {totals.shares > 0 ? (
             <button onClick={() => setShowDetails(!showDetails)}>
@@ -182,101 +179,103 @@ export default function Home() {
             <div>Calculating ...</div>
           )}
         </div>
-        {!showAdd && (
-          <div className="flex flex-row justify-between">
-            <form className="relative m-2 md:m-4 w-1/2 md:w-1/3">
-              <svg
-                width="20"
-                height="20"
-                fill="currentColor"
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-              >
-                <path
-                  fillRule="evenodd"
-                  clipRule="evenodd"
-                  d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                />
-              </svg>
-              <input
-                className="focus:border-light-blue-500 focus:ring-1 focus:ring-light-blue-500 focus:outline-none w-full text-md text-black placeholder-gray-400 border border-green-200 rounded-md py-2 pl-10"
-                type="text"
-                aria-label="Filter stocks"
-                placeholder="Filter stocks"
-                onChange={handleStockFilter}
-              />
-            </form>
-            <button
-              onClick={() => setShowAdd(true)}
-              className="m-2 w-8 h-8 text-green-600 self-center"
-            >
-              <PlusIcon />
-            </button>
-          </div>
-        )}
-        {showAdd && (
-          <div className="flex flex-col justify-center">
-            <div className="flex flex-row justify-between p-2">
-              <p className="text-center text-xl p-2">Add New Stock</p>
-              <button
-                onClick={() => setShowAdd(false)}
-                className="w-10 h-10 text-gray-600"
-              >
-                <XCircleIcon />
-              </button>
-            </div>
-
-            <form
-              className="flex flex-row gap-2 align-middle justify-center p-2"
-              onSubmit={handleCreateStock}
-            >
-              <fieldset className="flex flex-row justify-center align-middle">
-                <input
-                  className="border-2 rounded-sm p-1 text-xl"
-                  placeholder="Enter Ticker Symbol"
-                  defaultValue={``}
-                  name="ticker"
-                />
-              </fieldset>
-              <button className="bg-green-700 text-white p-2 rounded-sm">
-                Add Stock
-              </button>
-            </form>
-          </div>
-        )}
-        {stocks.map((stock) => (
-          <div key={stock.id} className="px-2">
-            <Link href={`/stock/${encodeURIComponent(stock.id)}`} passHref>
-              <a>
-                <div className="p-1 text-lg lg:text-xl w-full">
-                  <div className="flex flex-row justify-between">
-                    <p className="text-xl lg:text-2xl">{stock.ticker}</p>
-                    {stock.calculations ? (
-                      <div>
-                        {stock.calculations.stockGainLossPercent >= 0 ? (
-                          <p className="bg-green-400 rounded-md text-lg md:text-xl font-bold p-1 w-36 text-center">{`${(
-                            stock.calculations.stockGainLossPercent * 100
-                          ).toFixed(1)}%`}</p>
-                        ) : (
-                          <p className="bg-red-400 rounded-md text-lg md:text-xl font-bold p-1 w-36 text-center">{`${(
-                            stock.calculations.stockGainLossPercent * 100
-                          ).toFixed(1)}%`}</p>
-                        )}
-                      </div>
-                    ) : (
-                      <div>No Holdings</div>
-                    )}
-                  </div>
-                </div>
-              </a>
-            </Link>
+        <div className="lg:w-2/3 lg:m-auto">
+          {!showAdd && (
             <div className="flex flex-row justify-between">
-              <div className="text-xs">{stock.updatedAt}</div>
-              <button onClick={() => handleUpdateStock(stock.id)}>
-                Update
+              <form className="relative m-2 md:m-4 w-1/2 md:w-1/3">
+                <svg
+                  width="20"
+                  height="20"
+                  fill="currentColor"
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                >
+                  <path
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                    d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                  />
+                </svg>
+                <input
+                  className="focus:border-light-blue-500 focus:ring-1 focus:ring-light-blue-500 focus:outline-none w-full text-md text-black placeholder-gray-400 border border-green-200 rounded-md py-2 pl-10"
+                  type="text"
+                  aria-label="Filter stocks"
+                  placeholder="Filter stocks"
+                  onChange={handleStockFilter}
+                />
+              </form>
+              <button
+                onClick={() => setShowAdd(true)}
+                className="m-2 w-8 h-8 text-green-600 self-center"
+              >
+                <PlusIcon />
               </button>
             </div>
-          </div>
-        ))}
+          )}
+          {showAdd && (
+            <div className="flex flex-col justify-center">
+              <div className="flex flex-row justify-between p-2">
+                <p className="text-center text-xl p-2">Add New Stock</p>
+                <button
+                  onClick={() => setShowAdd(false)}
+                  className="w-10 h-10 text-gray-600"
+                >
+                  <XCircleIcon />
+                </button>
+              </div>
+
+              <form
+                className="flex flex-row gap-2 align-middle justify-center p-2"
+                onSubmit={handleCreateStock}
+              >
+                <fieldset className="flex flex-row justify-center align-middle">
+                  <input
+                    className="border-2 rounded-sm p-1 text-xl"
+                    placeholder="Enter Ticker Symbol"
+                    defaultValue={``}
+                    name="ticker"
+                  />
+                </fieldset>
+                <button className="bg-green-700 text-white p-2 rounded-sm">
+                  Add Stock
+                </button>
+              </form>
+            </div>
+          )}
+          {stocks.map((stock) => (
+            <div key={stock.id} className="px-2">
+              <Link href={`/stock/${encodeURIComponent(stock.id)}`} passHref>
+                <a>
+                  <div className="p-1 text-lg lg:text-xl w-full">
+                    <div className="flex flex-row justify-between">
+                      <p className="text-xl lg:text-2xl">{stock.ticker}</p>
+                      {stock.calculations ? (
+                        <div>
+                          {stock.calculations.stockGainLossPercent >= 0 ? (
+                            <p className="bg-green-400 rounded-md text-lg md:text-xl font-bold p-1 w-36 text-center">{`${(
+                              stock.calculations.stockGainLossPercent * 100
+                            ).toFixed(1)}%`}</p>
+                          ) : (
+                            <p className="bg-red-400 rounded-md text-lg md:text-xl font-bold p-1 w-36 text-center">{`${(
+                              stock.calculations.stockGainLossPercent * 100
+                            ).toFixed(1)}%`}</p>
+                          )}
+                        </div>
+                      ) : (
+                        <div>No Holdings</div>
+                      )}
+                    </div>
+                  </div>
+                </a>
+              </Link>
+              <div className="flex flex-row justify-between">
+                <div className="text-xs">{stock.updatedAt}</div>
+                <button onClick={() => handleUpdateStock(stock.id)}>
+                  Update
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
 
         {/* <table className="table-auto border-collapse m-2">
           <thead>

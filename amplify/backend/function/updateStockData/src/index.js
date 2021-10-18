@@ -6,6 +6,15 @@
 	REGION
 Amplify Params - DO NOT EDIT */
 
+/* This function runs on scheduled basis
+  CloudWatch runs this on schedule: cron(10,20,30,40,50 13-23 ? * MON-SAT *)
+  10/20/30/40/50 minutes past the hour MON-SAT between 8AM and 10 PM
+
+  It runs without an ID so that it updates the oldest thing.
+
+  Runs through Saturday to pickup anything lingering.
+*/
+
 const axios = require("axios");
 const gql = require("graphql-tag");
 const graphql = require("graphql");
@@ -71,15 +80,13 @@ const getStock = gql`
   }
 `;
 
-const sortedStocks = gql`
-  query stocksByUpdatedAt(
-    $type: StockType!
-    $sortDirection: ModelSortDirection!
-  ) {
-    stocksByUpdatedAt(type: $type, sortDirection: $sortDirection) {
+const listStocks = gql`
+  query listStocks {
+    listStocks {
       items {
         id
         ticker
+        updatedAt
         holdings {
           items {
             id
@@ -88,11 +95,33 @@ const sortedStocks = gql`
             costBasis
           }
         }
-        updatedAt
       }
     }
   }
 `;
+
+// const sortedStocks = gql`
+//   query stocksByUpdatedAt(
+//     $type: StockType!
+//     $sortDirection: ModelSortDirection!
+//   ) {
+//     stocksByUpdatedAt(type: $type, sortDirection: $sortDirection) {
+//       items {
+//         id
+//         ticker
+//         holdings {
+//           items {
+//             id
+//             purchaseDate
+//             shares
+//             costBasis
+//           }
+//         }
+//         updatedAt
+//       }
+//     }
+//   }
+// `;
 
 function calcStockTotals(holdings, price) {
   // const currency = new Intl.NumberFormat("en-US", {
@@ -148,15 +177,15 @@ function removeSpaceFromApiKeys(apiKeyValue) {
 exports.handler = async (event) => {
   try {
     console.log(">>> Event Arguments >>> ", event.arguments);
-    let ticker = ''
-    let id = ''
+    let ticker = "";
+    let id = "";
     if (event.arguments) {
-      id = event.arguments.id
+      id = event.arguments.id;
     }
-    let holdings = []
+    let holdings = [];
 
     if (id) {
-      console.log(">>> Called with ID: ", id)
+      console.log(">>> Called with ID: ", id);
       const currentStock = await axios({
         url: process.env.API_OBSIDO_GRAPHQLAPIENDPOINTOUTPUT,
         method: "post",
@@ -171,12 +200,9 @@ exports.handler = async (event) => {
         },
       });
 
-      console.log('Need to get ticker for: ', currentStock.data.data)
-
-      ticker = currentStock.data.data.getStock.ticker
-      holdings = currentStock.data.data.getStock.holdings
+      ticker = currentStock.data.data.getStock.ticker;
+      holdings = currentStock.data.data.getStock.holdings;
     } else {
-      console.log(">>> Called without ID!!!")
       const { data } = await axios({
         url: process.env.API_OBSIDO_GRAPHQLAPIENDPOINTOUTPUT,
         method: "post",
@@ -184,21 +210,17 @@ exports.handler = async (event) => {
           "x-api-key": process.env.API_OBSIDO_GRAPHQLAPIKEYOUTPUT,
         },
         data: {
-          query: print(sortedStocks),
-          variables: {
-            type: "Stock",
-            sortDirection: "ASC",
-          },
+          query: print(listStocks),
         },
       });
 
-      console.log('>>> Need to update this: ', data.data.stocksByUpdatedAt.items[0])
+      const oldest = data.data.listStocks.items.reduce((a, b) => {
+        return Date.parse(a.updatedAt) < Date.parse(b.updatedAt) ? a : b;
+      });
 
-      id = data.data.stocksByUpdatedAt.items[0].id
-      ticker = data.data.stocksByUpdatedAt.items[0].ticker
-      holdings = data.data.stocksByUpdatedAt.items[0].holdings
-
-      console.log('>>> set id & ticker & holdings >>>', id, ticker, holdings)
+      id = oldest.id
+      ticker = oldest.ticker
+      holdings = oldest.holdings
     }
 
     const stockData = await axios({
@@ -264,7 +286,7 @@ exports.handler = async (event) => {
                 formattedQuoteData.GlobalQuote["05.price"]
               ).currentValue,
               stockAvgPerShare: calcStockTotals(
-               holdings.items,
+                holdings.items,
                 formattedQuoteData.GlobalQuote["05.price"]
               ).average,
               stockGainLossPercent: calcStockTotals(

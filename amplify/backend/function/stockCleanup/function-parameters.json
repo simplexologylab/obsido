@@ -5,12 +5,6 @@
         "Query",
         "Mutation"
       ]
-    },
-    "function": {
-      "updateStockData": [
-        "read",
-        "update"
-      ]
     }
   },
   "lambdaLayers": []

@@ -113,9 +113,9 @@ export const updateStockData = /* GraphQL */ `
     }
   }
 `;
-export const updateAll = /* GraphQL */ `
-  mutation UpdateAll {
-    updateAll
+export const stockCleanup = /* GraphQL */ `
+  mutation StockCleanup {
+    stockCleanup
   }
 `;
 export const createStock = /* GraphQL */ `

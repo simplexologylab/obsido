@@ -27,10 +27,6 @@
     "apiobsidoGraphQLAPIKeyOutput": {
       "Type": "String",
       "Default": "apiobsidoGraphQLAPIKeyOutput"
-    },
-    "functionupdateStockDataName": {
-      "Type": "String",
-      "Default": "functionupdateStockDataName"
     }
   },
   "Conditions": {
@@ -63,12 +59,12 @@
         "FunctionName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "updateAll",
+            "stockCleanup",
             {
               "Fn::Join": [
                 "",
                 [
-                  "updateAll",
+                  "stockCleanup",
                   "-",
                   {
                     "Ref": "env"
@@ -94,9 +90,6 @@
             },
             "API_OBSIDO_GRAPHQLAPIKEYOUTPUT": {
               "Ref": "apiobsidoGraphQLAPIKeyOutput"
-            },
-            "FUNCTION_UPDATESTOCKDATA_NAME": {
-              "Ref": "functionupdateStockDataName"
             }
           }
         },
@@ -117,12 +110,12 @@
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "obsidoLambdaRole6a31cd91",
+            "obsidoLambdaRole4cf5beed",
             {
               "Fn::Join": [
                 "",
                 [
-                  "obsidoLambdaRole6a31cd91",
+                  "obsidoLambdaRole4cf5beed",
                   "-",
                   {
                     "Ref": "env"
@@ -251,36 +244,6 @@
                         "Ref": "apiobsidoGraphQLAPIIdOutput"
                       },
                       "/types/Mutation/*"
-                    ]
-                  ]
-                }
-              ]
-            },
-            {
-              "Effect": "Allow",
-              "Action": [
-                "lambda:Get*",
-                "lambda:List*",
-                "lambda:Invoke*",
-                "lambda:Update*"
-              ],
-              "Resource": [
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:aws:lambda:",
-                      {
-                        "Ref": "AWS::Region"
-                      },
-                      ":",
-                      {
-                        "Ref": "AWS::AccountId"
-                      },
-                      ":function:",
-                      {
-                        "Ref": "functionupdateStockDataName"
-                      }
                     ]
                   ]
                 }
