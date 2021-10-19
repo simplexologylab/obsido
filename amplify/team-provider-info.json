@@ -15,11 +15,11 @@
       "function": {
         "addStock": {
           "deploymentBucketName": "amplify-obsido-dev-75210-deployment",
-          "s3Key": "amplify-builds/addStock-3773544e444a69342b64-build.zip"
+          "s3Key": "amplify-builds/addStock-367a314634617a4e4939-build.zip"
         },
         "updateStockData": {
           "deploymentBucketName": "amplify-obsido-dev-75210-deployment",
-          "s3Key": "amplify-builds/updateStockData-76636e694756334f796d-build.zip"
+          "s3Key": "amplify-builds/updateStockData-744c6965414641614977-build.zip"
         },
         "stockCleanup": {
           "deploymentBucketName": "amplify-obsido-dev-75210-deployment",

@@ -40,6 +40,7 @@ type Overview {
   sector: String
   marketCap: String
   dividendYield: String
+  peRatio: String
   last52High: String
   last52Low: String
   dma50: String

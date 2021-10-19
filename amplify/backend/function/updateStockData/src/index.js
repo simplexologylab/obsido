@@ -33,6 +33,7 @@ const updateStock = gql`
         sector
         marketCap
         dividendYield
+        peRatio
         last52High
         last52Low
         dma50
@@ -253,6 +254,7 @@ exports.handler = async (event) => {
               sector: stockData.data.Sector,
               marketCap: stockData.data.MarketCapitalization,
               dividendYield: stockData.data.DividendYield,
+              peRatio: stockData.data.PERatio,
               last52High: stockData.data["52WeekHigh"],
               last52Low: stockData.data["52WeekLow"],
               dma50: stockData.data["50DayMovingAverage"],

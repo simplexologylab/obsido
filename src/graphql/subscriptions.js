@@ -14,6 +14,7 @@ export const onCreateStock = /* GraphQL */ `
         sector
         marketCap
         dividendYield
+        peRatio
         last52High
         last52Low
         dma50
@@ -70,6 +71,7 @@ export const onUpdateStock = /* GraphQL */ `
         sector
         marketCap
         dividendYield
+        peRatio
         last52High
         last52Low
         dma50
@@ -126,6 +128,7 @@ export const onDeleteStock = /* GraphQL */ `
         sector
         marketCap
         dividendYield
+        peRatio
         last52High
         last52Low
         dma50
@@ -190,6 +193,7 @@ export const onCreateHolding = /* GraphQL */ `
           sector
           marketCap
           dividendYield
+          peRatio
           last52High
           last52Low
           dma50
@@ -246,6 +250,7 @@ export const onUpdateHolding = /* GraphQL */ `
           sector
           marketCap
           dividendYield
+          peRatio
           last52High
           last52Low
           dma50
@@ -302,6 +307,7 @@ export const onDeleteHolding = /* GraphQL */ `
           sector
           marketCap
           dividendYield
+          peRatio
           last52High
           last52Low
           dma50

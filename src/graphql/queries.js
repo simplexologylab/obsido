@@ -24,6 +24,7 @@ export const getStock = /* GraphQL */ `
         sector
         marketCap
         dividendYield
+        peRatio
         last52High
         last52Low
         dma50
@@ -85,6 +86,7 @@ export const listStocks = /* GraphQL */ `
           sector
           marketCap
           dividendYield
+          peRatio
           last52High
           last52Low
           dma50
@@ -140,6 +142,7 @@ export const getHolding = /* GraphQL */ `
           sector
           marketCap
           dividendYield
+          peRatio
           last52High
           last52Low
           dma50
@@ -233,6 +236,7 @@ export const stocksByUpdatedAt = /* GraphQL */ `
           sector
           marketCap
           dividendYield
+          peRatio
           last52High
           last52Low
           dma50
