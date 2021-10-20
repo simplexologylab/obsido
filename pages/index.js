@@ -275,6 +275,27 @@ export default function Home() {
                               100
                             ).toFixed(1)}%`}</p>
                           )}
+                          {stock.calculations.stockCAGR && (
+                            <p className="bg-gray-200 p-1 rounded-sm">
+                              {`CAGR: ${(
+                                stock.calculations.stockCAGR * 100
+                              ).toFixed(1)}%`}
+                            </p>
+                          )}
+                          {stock.calculations.stockMAGR && (
+                            <p className="bg-gray-200 p-1 rounded-sm">
+                              {`MAGR: ${(
+                                stock.calculations.stockMAGR * 100
+                              ).toFixed(1)}%`}
+                            </p>
+                          )}
+                          {stock.calculations.stockWAGR && (
+                            <p className="bg-gray-200 p-1 rounded-sm">
+                              {`WAGR: ${(
+                                stock.calculations.stockWAGR * 100
+                              ).toFixed(1)}%`}
+                            </p>
+                          )}
                         </div>
                       </div>
                       {stock.calculations ? (

@@ -104,7 +104,7 @@ export default function Stock() {
             brokerage: form.get("brokerage"),
             costBasis: form.get("costBasis"),
             holdingStockId: stockInfo.id,
-            purchaseDate: "2021-01-02",
+            purchaseDate: form.get("purchaseDate"),
             shares: form.get("shares"),
             notes: form.get("notes"),
           },
@@ -307,10 +307,10 @@ export default function Stock() {
           ) : (
             <div className="p-6">No Holdings</div>
           )}
-{/* 
+
           <pre className="p-10 md:p-20">
             <code>{JSON.stringify(stockInfo, null, 2)}</code>
-          </pre> */}
+          </pre>
         </div>
       </Layout>
     );

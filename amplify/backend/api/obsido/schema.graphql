@@ -65,6 +65,9 @@ type Calculation {
   stockCurrentValue: Float
   stockAvgPerShare: Float
   stockGainLossPercent: Float
+  stockCAGR: Float
+  stockMAGR: Float
+  stockWAGR: Float
 }
 
 type Query {

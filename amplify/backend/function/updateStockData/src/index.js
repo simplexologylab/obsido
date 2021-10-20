@@ -56,6 +56,9 @@ const updateStock = gql`
         stockCurrentValue
         stockAvgPerShare
         stockGainLossPercent
+        stockCAGR
+        stockMAGR
+        stockWAGR
       }
       createdAt
       updatedAt
@@ -135,12 +138,33 @@ function calcStockTotals(holdings, price) {
     costBasis: 0,
     gainLoss: 0,
     gainLossPercent: 0,
+    years: 0,
+    months: 0,
+    weeks: 0,
   };
 
-  holdings.forEach(({ shares, costBasis }) => {
+  let currentDate = new Date();
+
+  holdings.forEach(({ shares, costBasis, purchaseDate }) => {
+    const compareDate = new Date(purchaseDate);
+    const differenceYears = Math.abs(currentDate - compareDate) / 31556952000;
+    const differenceMonths = Math.abs(currentDate - compareDate) / 2629746000;
+    const differenceWeeks = Math.abs(currentDate - compareDate) / 604800000;
+
     total.costBasis = total.costBasis + shares * costBasis;
     total.shares = total.shares + shares;
     total.gainLoss = total.gainLoss + (price - costBasis) * shares;
+
+    if (differenceYears > total.years) {
+      total.years = differenceYears;
+    }
+
+    if (differenceMonths > total.months) {
+      total.months = differenceMonths;
+    }
+    if (differenceWeeks > total.weeks) {
+      total.weeks = differenceWeeks;
+    }
   });
 
   // total.basisDifference = (
@@ -152,6 +176,27 @@ function calcStockTotals(holdings, price) {
   total.costBasis = total.costBasis;
   total.gainLoss = total.gainLoss;
   total.currentValue = total.shares * price;
+
+  if (total.years > 1) {
+    total.CAGR =
+      (total.currentValue / total.costBasis) ** (1 / total.years) - 1;
+  } else {
+    total.CAGR = (total.currentValue / total.costBasis) ** 1 - 1;
+  }
+
+  if (total.months > 1) {
+    total.MAGR =
+      (total.currentValue / total.costBasis) ** (1 / total.months) - 1;
+  } else {
+    total.MAGR = (total.currentValue / total.costBasis) ** 1 - 1;
+  }
+
+  if (total.weeks > 1) {
+    total.WAGR =
+      (total.currentValue / total.costBasis) ** (1 / total.weeks) - 1;
+  } else {
+    total.WAGR = (total.currentValue / total.costBasis) ** 1 - 1;
+  }
 
   return total;
 }
@@ -177,7 +222,6 @@ function removeSpaceFromApiKeys(apiKeyValue) {
 
 exports.handler = async (event) => {
   try {
-    console.log(">>> Event Arguments >>> ", event.arguments);
     let ticker = "";
     let id = "";
     if (event.arguments) {
@@ -186,7 +230,6 @@ exports.handler = async (event) => {
     let holdings = [];
 
     if (id) {
-      console.log(">>> Called with ID: ", id);
       const currentStock = await axios({
         url: process.env.API_OBSIDO_GRAPHQLAPIENDPOINTOUTPUT,
         method: "post",
@@ -219,9 +262,9 @@ exports.handler = async (event) => {
         return Date.parse(a.updatedAt) < Date.parse(b.updatedAt) ? a : b;
       });
 
-      id = oldest.id
-      ticker = oldest.ticker
-      holdings = oldest.holdings
+      id = oldest.id;
+      ticker = oldest.ticker;
+      holdings = oldest.holdings;
     }
 
     const stockData = await axios({
@@ -235,6 +278,11 @@ exports.handler = async (event) => {
     });
 
     const formattedQuoteData = removeSpaceFromApiKeys(quoteData.data);
+
+    const calculatedStockData = calcStockTotals(
+      holdings.items,
+      formattedQuoteData.GlobalQuote["05.price"]
+    );
 
     const update = await axios({
       url: process.env.API_OBSIDO_GRAPHQLAPIENDPOINTOUTPUT,
@@ -271,36 +319,20 @@ exports.handler = async (event) => {
               changePercent: formattedQuoteData.GlobalQuote["10.changepercent"],
             },
             calculations: {
-              stockTotalShares: calcStockTotals(
-                holdings.items,
-                formattedQuoteData.GlobalQuote["05.price"]
-              ).shares,
-              stockCostBasis: calcStockTotals(
-                holdings.items,
-                formattedQuoteData.GlobalQuote["05.price"]
-              ).costBasis,
-              stockGainLoss: calcStockTotals(
-                holdings.items,
-                formattedQuoteData.GlobalQuote["05.price"]
-              ).gainLoss,
-              stockCurrentValue: calcStockTotals(
-                holdings.items,
-                formattedQuoteData.GlobalQuote["05.price"]
-              ).currentValue,
-              stockAvgPerShare: calcStockTotals(
-                holdings.items,
-                formattedQuoteData.GlobalQuote["05.price"]
-              ).average,
-              stockGainLossPercent: calcStockTotals(
-                holdings.items,
-                formattedQuoteData.GlobalQuote["05.price"]
-              ).gainLossPercent,
+              stockTotalShares: calculatedStockData.shares,
+              stockCostBasis: calculatedStockData.costBasis,
+              stockGainLoss: calculatedStockData.gainLoss,
+              stockCurrentValue: calculatedStockData.currentValue,
+              stockAvgPerShare: calculatedStockData.average,
+              stockGainLossPercent: calculatedStockData.gainLossPercent,
+              stockCAGR: calculatedStockData.CAGR,
+              stockMAGR: calculatedStockData.MAGR,
+              stockWAGR: calculatedStockData.WAGR,
             },
           },
         },
       },
     });
-    console.log(">>> Returned update: ", update.data.data.updateStock);
     return update.data.data.updateStock;
   } catch (err) {
     console.log(">>> Error in updateStockData", err);

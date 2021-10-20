@@ -52,6 +52,9 @@ export const addStock = /* GraphQL */ `
         stockCurrentValue
         stockAvgPerShare
         stockGainLossPercent
+        stockCAGR
+        stockMAGR
+        stockWAGR
       }
       createdAt
       updatedAt
@@ -109,6 +112,9 @@ export const updateStockData = /* GraphQL */ `
         stockCurrentValue
         stockAvgPerShare
         stockGainLossPercent
+        stockCAGR
+        stockMAGR
+        stockWAGR
       }
       createdAt
       updatedAt
@@ -174,6 +180,9 @@ export const createStock = /* GraphQL */ `
         stockCurrentValue
         stockAvgPerShare
         stockGainLossPercent
+        stockCAGR
+        stockMAGR
+        stockWAGR
       }
       createdAt
       updatedAt
@@ -234,6 +243,9 @@ export const updateStock = /* GraphQL */ `
         stockCurrentValue
         stockAvgPerShare
         stockGainLossPercent
+        stockCAGR
+        stockMAGR
+        stockWAGR
       }
       createdAt
       updatedAt
@@ -294,6 +306,9 @@ export const deleteStock = /* GraphQL */ `
         stockCurrentValue
         stockAvgPerShare
         stockGainLossPercent
+        stockCAGR
+        stockMAGR
+        stockWAGR
       }
       createdAt
       updatedAt
@@ -351,6 +366,9 @@ export const createHolding = /* GraphQL */ `
           stockCurrentValue
           stockAvgPerShare
           stockGainLossPercent
+          stockCAGR
+          stockMAGR
+          stockWAGR
         }
         createdAt
         updatedAt
@@ -411,6 +429,9 @@ export const updateHolding = /* GraphQL */ `
           stockCurrentValue
           stockAvgPerShare
           stockGainLossPercent
+          stockCAGR
+          stockMAGR
+          stockWAGR
         }
         createdAt
         updatedAt
@@ -471,6 +492,9 @@ export const deleteHolding = /* GraphQL */ `
           stockCurrentValue
           stockAvgPerShare
           stockGainLossPercent
+          stockCAGR
+          stockMAGR
+          stockWAGR
         }
         createdAt
         updatedAt
