@@ -13,12 +13,15 @@ import {
 import awsExports from "../src/aws-exports";
 import Layout from "../src/components/layout";
 import PriceRange from "../src/components/price-range";
+import DisplayData from "../src/components/display-data";
 
 import {
   PlusIcon,
   XCircleIcon,
   ChevronDoubleRightIcon,
   MinusCircleIcon,
+  AdjustmentsIcon,
+  SearchIcon,
 } from "@heroicons/react/outline";
 
 import {
@@ -49,9 +52,11 @@ export default function Home() {
   const [stocks, setStocks] = useState([]);
   const [initial, setInitial] = useState([]);
   const [showAdd, setShowAdd] = useState(false);
+  const [showAdjust, setShowAdjust] = useState(false);
   const [errors, setErrors] = useState([]);
   const [totals, setTotals] = useState({});
   const [showDetails, setShowDetails] = useState(false);
+  const [display, setDisplay] = useState("stockGainLossPercent");
 
   useEffect(() => {
     async function getStocks() {
@@ -140,6 +145,10 @@ export default function Home() {
     setStocks(filtered);
   }
 
+  function handleDisplayChange(change) {
+    setDisplay(change);
+  }
+
   return (
     <Layout headTitle="Obsido | Home">
       <div className="flex flex-col justify-center font-primary">
@@ -181,21 +190,16 @@ export default function Home() {
           )}
         </div>
         <div className="lg:w-2/3 lg:m-auto">
-          {!showAdd && (
-            <div className="flex flex-row justify-between">
+          {!showAdd && !showAdjust && (
+            <div className="flex flex-row justify-between ">
+              <button
+                onClick={() => setShowAdd(true)}
+                className="m-2 w-8 h-8 text-green-600 self-center"
+              >
+                <PlusIcon />
+              </button>
               <form className="relative m-2 md:m-4 w-1/2 md:w-1/3">
-                <svg
-                  width="20"
-                  height="20"
-                  fill="currentColor"
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                >
-                  <path
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                    d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                  />
-                </svg>
+                <SearchIcon className="absolute w-5 h-5 left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <input
                   className="focus:border-light-blue-500 focus:ring-1 focus:ring-light-blue-500 focus:outline-none w-full text-md text-black placeholder-gray-400 border border-green-200 rounded-md py-2 pl-10"
                   type="text"
@@ -205,10 +209,10 @@ export default function Home() {
                 />
               </form>
               <button
-                onClick={() => setShowAdd(true)}
+                onClick={() => setShowAdjust(true)}
                 className="m-2 w-8 h-8 text-green-600 self-center"
               >
-                <PlusIcon />
+                <AdjustmentsIcon />
               </button>
             </div>
           )}
@@ -242,6 +246,42 @@ export default function Home() {
               </form>
             </div>
           )}
+          {showAdjust && (
+            <div className="flex flex-row justify-between p-4">
+              <div className="flex flex-col sm:flex-row gap-4 sm:gap-10 justify-center">
+                <button
+                  className="border-solid border-4 border-green-400 p-5 rounded-xl filter drop-shadow-sm"
+                  onClick={() => handleDisplayChange("stockGainLossPercent")}
+                >
+                  Gain/Loss Percent
+                </button>
+                <button
+                  className="border-solid border-4 border-green-400 p-5 rounded-xl filter drop-shadow-sm"
+                  onClick={() => handleDisplayChange("stockCAGR")}
+                >
+                  CAGR
+                </button>
+                <button
+                  className="border-solid border-4 border-green-400 p-5 rounded-xl filter drop-shadow-sm"
+                  onClick={() => handleDisplayChange("stockMAGR")}
+                >
+                  MAGR
+                </button>
+                <button
+                  className="border-solid border-4 border-green-400 p-5 rounded-xl filter drop-shadow-sm"
+                  onClick={() => handleDisplayChange("stockWAGR")}
+                >
+                  WAGR
+                </button>
+              </div>
+              <button
+                onClick={() => setShowAdjust(false)}
+                className="w-10 h-10 text-gray-600"
+              >
+                <XCircleIcon />
+              </button>
+            </div>
+          )}
           {stocks.length > 0 &&
             stocks.map((stock) => (
               <div key={stock.id} className="px-2">
@@ -254,7 +294,7 @@ export default function Home() {
                         </p>
                         {stock.calculations ? (
                           <div className="flex flex-col gap-2">
-                            {stock.calculations.stockGainLossPercent >= 0 ? (
+                            {/* {stock.calculations.stockGainLossPercent >= 0 ? (
                               <p className="bg-green-400 rounded-md text-lg md:text-xl font-bold p-1 text-center float-right">{`${(
                                 stock.calculations.stockGainLossPercent * 100
                               ).toFixed(1)}%`}</p>
@@ -262,7 +302,11 @@ export default function Home() {
                               <p className="bg-red-400 rounded-md text-lg md:text-xl font-bold p-1 text-center float-right">{`${(
                                 stock.calculations.stockGainLossPercent * 100
                               ).toFixed(1)}%`}</p>
-                            )}
+                            )} */}
+                            <DisplayData
+                              calculations={stock.calculations}
+                              setting={display}
+                            />
                             <PriceRange
                               low={stock.overview.last52Low}
                               price={stock.quote.price}
