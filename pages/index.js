@@ -242,95 +242,94 @@ export default function Home() {
               </form>
             </div>
           )}
-          {stocks.map((stock) => (
-            <div key={stock.id} className="px-2">
-              <Link href={`/stock/${encodeURIComponent(stock.id)}`} passHref>
-                <a>
-                  <div className="p-1 text-lg lg:text-xl w-full">
-                    <div className="flex flex-row justify-between">
-                      <div className="flex flex-col md:flex-row md:items-center gap-2">
+          {stocks.length > 0 &&
+            stocks.map((stock) => (
+              <div key={stock.id} className="px-2">
+                <Link href={`/stock/${encodeURIComponent(stock.id)}`} passHref>
+                  <a>
+                    <div className="p-1 text-lg lg:text-xl w-full">
+                      <div className="flex flex-row justify-between items-center">
                         <p className="text-xl lg:text-2xl">
                           {stock.ticker} ({stock.quote.price})
                         </p>
-                        <div className="flex flex-row flex-wrap text-xs justify-start gap-2">
-                          {stock.overview.peRatio > 0 && (
-                            <p className="bg-gray-200 p-1 rounded-sm">{`PE: ${stock.overview.peRatio}`}</p>
-                          )}
-                          {stock.overview.dividendYield > 0 && (
-                            <p className="bg-gray-200 p-1 rounded-sm">{`Div: ${(
-                              stock.overview.dividendYield * 100
-                            ).toFixed(2)}%`}</p>
-                          )}
-                          {stock.overview.dma50 && (
-                            <p className="bg-gray-200 p-1 rounded-sm">{`DMA50: ${(
-                              ((stock.quote.price - stock.overview.dma50) /
-                                stock.overview.dma50) *
-                              100
-                            ).toFixed(1)}%`}</p>
-                          )}
-                          {stock.overview.dma200 && (
-                            <p className="bg-gray-200 p-1 rounded-sm">{`DMA200: ${(
-                              ((stock.quote.price - stock.overview.dma200) /
-                                stock.overview.dma200) *
-                              100
-                            ).toFixed(1)}%`}</p>
-                          )}
-                          {stock.calculations.stockCAGR && (
-                            <p className="bg-gray-200 p-1 rounded-sm">
-                              {`CAGR: ${(
-                                stock.calculations.stockCAGR * 100
-                              ).toFixed(1)}%`}
-                            </p>
-                          )}
-                          {stock.calculations.stockMAGR && (
-                            <p className="bg-gray-200 p-1 rounded-sm">
-                              {`MAGR: ${(
-                                stock.calculations.stockMAGR * 100
-                              ).toFixed(1)}%`}
-                            </p>
-                          )}
-                          {stock.calculations.stockWAGR && (
-                            <p className="bg-gray-200 p-1 rounded-sm">
-                              {`WAGR: ${(
-                                stock.calculations.stockWAGR * 100
-                              ).toFixed(1)}%`}
-                            </p>
-                          )}
-                        </div>
+                        {stock.calculations ? (
+                          <div className="flex flex-col gap-2">
+                            {stock.calculations.stockGainLossPercent >= 0 ? (
+                              <p className="bg-green-400 rounded-md text-lg md:text-xl font-bold p-1 text-center float-right">{`${(
+                                stock.calculations.stockGainLossPercent * 100
+                              ).toFixed(1)}%`}</p>
+                            ) : (
+                              <p className="bg-red-400 rounded-md text-lg md:text-xl font-bold p-1 text-center float-right">{`${(
+                                stock.calculations.stockGainLossPercent * 100
+                              ).toFixed(1)}%`}</p>
+                            )}
+                            <PriceRange
+                              low={stock.overview.last52Low}
+                              price={stock.quote.price}
+                              high={stock.overview.last52High}
+                              id={stock.id}
+                            />
+                          </div>
+                        ) : (
+                          <div>No Holdings</div>
+                        )}
                       </div>
-                      {stock.calculations ? (
-                        <div className="flex flex-col gap-2">
-                          {stock.calculations.stockGainLossPercent >= 0 ? (
-                            <p className="bg-green-400 rounded-md text-lg md:text-xl font-bold p-1 text-center float-right">{`${(
-                              stock.calculations.stockGainLossPercent * 100
-                            ).toFixed(1)}%`}</p>
-                          ) : (
-                            <p className="bg-red-400 rounded-md text-lg md:text-xl font-bold p-1 text-center float-right">{`${(
-                              stock.calculations.stockGainLossPercent * 100
-                            ).toFixed(1)}%`}</p>
-                          )}
-                          <PriceRange
-                            low={stock.overview.last52Low}
-                            price={stock.quote.price}
-                            high={stock.overview.last52High}
-                            id={stock.id}
-                          />
-                        </div>
-                      ) : (
-                        <div>No Holdings</div>
-                      )}
+                      <div className="flex flex-row flex-wrap text-xs justify-start gap-2 p-2">
+                        {stock.overview.peRatio > 0 && (
+                          <p className="bg-gray-200 p-1 rounded-sm">{`PE: ${stock.overview.peRatio}`}</p>
+                        )}
+                        {stock.overview.dividendYield > 0 && (
+                          <p className="bg-gray-200 p-1 rounded-sm">{`Div: ${(
+                            stock.overview.dividendYield * 100
+                          ).toFixed(2)}%`}</p>
+                        )}
+                        {stock.overview.dma50 && (
+                          <p className="bg-gray-200 p-1 rounded-sm">{`DMA50: ${(
+                            ((stock.quote.price - stock.overview.dma50) /
+                              stock.overview.dma50) *
+                            100
+                          ).toFixed(1)}%`}</p>
+                        )}
+                        {stock.overview.dma200 && (
+                          <p className="bg-gray-200 p-1 rounded-sm">{`DMA200: ${(
+                            ((stock.quote.price - stock.overview.dma200) /
+                              stock.overview.dma200) *
+                            100
+                          ).toFixed(1)}%`}</p>
+                        )}
+                        {stock.calculations.stockCAGR && (
+                          <p className="bg-gray-200 p-1 rounded-sm">
+                            {`CAGR: ${(
+                              stock.calculations.stockCAGR * 100
+                            ).toFixed(1)}%`}
+                          </p>
+                        )}
+                        {stock.calculations.stockMAGR && (
+                          <p className="bg-gray-200 p-1 rounded-sm">
+                            {`MAGR: ${(
+                              stock.calculations.stockMAGR * 100
+                            ).toFixed(1)}%`}
+                          </p>
+                        )}
+                        {stock.calculations.stockWAGR && (
+                          <p className="bg-gray-200 p-1 rounded-sm">
+                            {`WAGR: ${(
+                              stock.calculations.stockWAGR * 100
+                            ).toFixed(1)}%`}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                </a>
-              </Link>
-              <div className="flex flex-row justify-between">
-                <div className="text-xs">{stock.updatedAt}</div>
-                <button onClick={() => handleUpdateStock(stock.id)}>
-                  Update
-                </button>
+                  </a>
+                </Link>
+                <div className="flex flex-row justify-between">
+                  <div className="text-xs">{stock.updatedAt}</div>
+                  <button onClick={() => handleUpdateStock(stock.id)}>
+                    Update
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
         </div>
 
         {/* <table className="table-auto border-collapse m-2">
