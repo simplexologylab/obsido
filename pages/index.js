@@ -51,8 +51,12 @@ export async function getServerSideProps({ req }) {
 export default function Home() {
   const [stocks, setStocks] = useState([]);
   const [initial, setInitial] = useState([]);
+
   const [showAdd, setShowAdd] = useState(false);
+  const [addStock, setAddStock] = useState("");
+
   const [showAdjust, setShowAdjust] = useState(false);
+
   const [errors, setErrors] = useState([]);
   const [totals, setTotals] = useState({});
   const [showDetails, setShowDetails] = useState(false);
@@ -62,6 +66,7 @@ export default function Home() {
     async function getStocks() {
       try {
         const stockData = await API.graphql(graphqlOperation(listStocks));
+        console.log("Stock data: ", stockData);
         setStocks(stockData.data.listStocks.items);
         setInitial(stockData.data.listStocks.items);
       } catch (err) {
@@ -77,15 +82,12 @@ export default function Home() {
     setTotals(calcHoldingsTotals(stocks));
   }, [stocks]);
 
-  async function handleCreateStock(event) {
-    event.preventDefault();
-
-    const form = new FormData(event.target);
-
+  async function handleCreateStock() {
+    console.log("Tryign to create stock: ", addStock);
     try {
       const { data } = await API.graphql(
         graphqlOperation(AddStock, {
-          ticker: form.get("ticker"),
+          ticker: addStock,
         })
       );
       setStocks([...stocks, data.addStock]);
@@ -190,97 +192,130 @@ export default function Home() {
           )}
         </div>
         <div className="lg:w-2/3 lg:m-auto">
-          {!showAdd && !showAdjust && (
-            <div className="flex flex-row justify-between ">
-              <button
-                onClick={() => setShowAdd(true)}
-                className="m-2 w-8 h-8 text-green-600 self-center"
-              >
-                <PlusIcon />
-              </button>
-              <form className="relative m-2 md:m-4 w-1/2 md:w-1/3">
-                <SearchIcon className="absolute w-5 h-5 left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                <input
-                  className="focus:border-light-blue-500 focus:ring-1 focus:ring-light-blue-500 focus:outline-none w-full text-md text-black placeholder-gray-400 border border-green-200 rounded-md py-2 pl-10"
-                  type="text"
-                  aria-label="Filter stocks"
-                  placeholder="Filter stocks"
-                  onChange={handleStockFilter}
-                />
-              </form>
-              <button
-                onClick={() => setShowAdjust(true)}
-                className="m-2 w-8 h-8 text-green-600 self-center"
-              >
-                <AdjustmentsIcon />
-              </button>
-            </div>
-          )}
-          {showAdd && (
-            <div className="flex flex-col justify-center">
-              <div className="flex flex-row justify-between p-2">
-                <p className="text-center text-xl p-2">Add New Stock</p>
-                <button
-                  onClick={() => setShowAdd(false)}
-                  className="w-10 h-10 text-gray-600"
-                >
-                  <XCircleIcon />
-                </button>
-              </div>
+          <div className="flex flex-row justify-between">
+            <button
+              onClick={() => setShowAdd(true)}
+              className="bg-green-500 text-white uppercase text-3xl font-bold px-4 m-3 rounded shadow hover:shadow-lg outline-none focus:outline-none ease-linear transition-all duration-150"
+            >
+              +
+            </button>
+            <form className="relative m-2 md:m-4 w-1/2 md:w-1/3 hover:w-2/3">
+              <SearchIcon className="absolute w-5 h-5 left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <input
+                className="focus:border-light-blue-500 focus:ring-1 focus:ring-green-400 focus:outline-none w-full shadow text-md text-black placeholder-gray-400 rounded-md py-2 pl-10"
+                type="text"
+                aria-label="Filter stocks"
+                placeholder="Filter stocks"
+                onChange={handleStockFilter}
+              />
+            </form>
+            <button
+              onClick={() => setShowAdjust(true)}
+              // className="m-2 w-8 h-8 text-green-600 self-center"
+              className="text-gray-500 px-2 m-3 hover:shadow-lg outline-none focus:outline-none ease-linear transition-all duration-150"
+            >
+              <AdjustmentsIcon className="w-8 h-8" />
+            </button>
+          </div>
 
-              <form
-                className="flex flex-row gap-2 align-middle justify-center p-2"
-                onSubmit={handleCreateStock}
-              >
-                <fieldset className="flex flex-row justify-center align-middle">
-                  <input
-                    className="border-2 rounded-sm p-1 text-xl"
-                    placeholder="Enter Ticker Symbol"
-                    defaultValue={``}
-                    name="ticker"
-                  />
-                </fieldset>
-                <button className="bg-green-700 text-white p-2 rounded-sm">
-                  Add Stock
-                </button>
-              </form>
-            </div>
+          {showAdd && (
+            <>
+              <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
+                <div className="relative w-auto my-2 mx-auto max-w-3xl">
+                  {/*content*/}
+                  <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
+                    {/*header*/}
+                    <div className="flex flex-row justify-between p-5 border-b border-solid border-blueGray-200 rounded-t">
+                      <h3 className="text-2xl font-semibold">Add Stock</h3>
+                      <button
+                        className="p-1 ml-auto border-0 text-black opacity-50 float-right text-3xl leading-none font-semibold outline-none focus:outline-none"
+                        onClick={() => setShowAdd(false)}
+                      >
+                        x
+                      </button>
+                    </div>
+                    {/*body*/}
+                    <div className="relative p-6 flex-auto">
+                      <div className="flex flex-col justify-center gap-6">
+                        <input
+                          className="border-2 rounded-sm p-1 text-xl"
+                          placeholder="Enter Ticker Symbol"
+                          defaultValue={``}
+                          name="ticker"
+                          value={addStock}
+                          onChange={(e) =>
+                            setAddStock(e.target.value.toUpperCase())
+                          }
+                        />
+                        <button
+                          className="bg-green-700 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                          type="button"
+                          onClick={() => handleCreateStock()}
+                        >
+                          Add Stock
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="opacity-50 fixed inset-0 z-40 bg-black"></div>
+            </>
           )}
           {showAdjust && (
-            <div className="flex flex-row justify-between p-4">
-              <div className="flex flex-col sm:flex-row gap-4 sm:gap-10 justify-center">
-                <button
-                  className="border-solid border-4 border-green-400 p-5 rounded-xl filter drop-shadow-sm"
-                  onClick={() => handleDisplayChange("stockGainLossPercent")}
-                >
-                  Gain/Loss Percent
-                </button>
-                <button
-                  className="border-solid border-4 border-green-400 p-5 rounded-xl filter drop-shadow-sm"
-                  onClick={() => handleDisplayChange("stockCAGR")}
-                >
-                  CAGR
-                </button>
-                <button
-                  className="border-solid border-4 border-green-400 p-5 rounded-xl filter drop-shadow-sm"
-                  onClick={() => handleDisplayChange("stockMAGR")}
-                >
-                  MAGR
-                </button>
-                <button
-                  className="border-solid border-4 border-green-400 p-5 rounded-xl filter drop-shadow-sm"
-                  onClick={() => handleDisplayChange("stockWAGR")}
-                >
-                  WAGR
-                </button>
+            <>
+              <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
+                <div className="relative w-auto my-2 mx-auto max-w-3xl">
+                  {/*content*/}
+                  <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
+                    {/*header*/}
+                    <div className="flex flex-row justify-between p-5 border-b border-solid border-blueGray-200 rounded-t">
+                      <h3 className="text-2xl font-semibold">Adjust Settings</h3>
+                      <button
+                        className="p-1 ml-auto border-0 text-black opacity-50 float-right text-3xl leading-none font-semibold outline-none focus:outline-none"
+                        onClick={() => setShowAdjust(false)}
+                      >
+                        x
+                      </button>
+                    </div>
+                    {/*body*/}
+                    <div className="relative p-6 flex-auto">
+                      <div className="flex flex-row justify-between p-4">
+                        <div className="flex flex-col sm:flex-row gap-4 sm:gap-10 justify-center">
+                          <button
+                            className="border-solid border-4 border-green-400 p-5 rounded-xl filter drop-shadow-sm"
+                            onClick={() =>
+                              handleDisplayChange("stockGainLossPercent")
+                            }
+                          >
+                            Gain/Loss Percent
+                          </button>
+                          <button
+                            className="border-solid border-4 border-green-400 p-5 rounded-xl filter drop-shadow-sm"
+                            onClick={() => handleDisplayChange("stockCAGR")}
+                          >
+                            CAGR
+                          </button>
+                          <button
+                            className="border-solid border-4 border-green-400 p-5 rounded-xl filter drop-shadow-sm"
+                            onClick={() => handleDisplayChange("stockMAGR")}
+                          >
+                            MAGR
+                          </button>
+                          <button
+                            className="border-solid border-4 border-green-400 p-5 rounded-xl filter drop-shadow-sm"
+                            onClick={() => handleDisplayChange("stockWAGR")}
+                          >
+                            WAGR
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <button
-                onClick={() => setShowAdjust(false)}
-                className="w-10 h-10 text-gray-600"
-              >
-                <XCircleIcon />
-              </button>
-            </div>
+              <div className="opacity-50 fixed inset-0 z-40 bg-black"></div>
+            </>
           )}
           {stocks.length > 0 &&
             stocks.map((stock) => (
@@ -341,21 +376,21 @@ export default function Home() {
                             100
                           ).toFixed(1)}%`}</p>
                         )}
-                        {stock.calculations.stockCAGR && (
+                        {stock.calculations && (
                           <p className="bg-gray-200 p-1 rounded-sm">
                             {`CAGR: ${(
                               stock.calculations.stockCAGR * 100
                             ).toFixed(1)}%`}
                           </p>
                         )}
-                        {stock.calculations.stockMAGR && (
+                        {stock.calculations && (
                           <p className="bg-gray-200 p-1 rounded-sm">
                             {`MAGR: ${(
                               stock.calculations.stockMAGR * 100
                             ).toFixed(1)}%`}
                           </p>
                         )}
-                        {stock.calculations.stockWAGR && (
+                        {stock.calculations && (
                           <p className="bg-gray-200 p-1 rounded-sm">
                             {`WAGR: ${(
                               stock.calculations.stockWAGR * 100
