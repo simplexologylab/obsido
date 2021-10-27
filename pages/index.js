@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 
 import { AmplifyAuthenticator } from "@aws-amplify/ui-react";
@@ -60,7 +60,9 @@ export default function Home() {
   const [errors, setErrors] = useState([]);
   const [totals, setTotals] = useState({});
   const [showDetails, setShowDetails] = useState(false);
+
   const [display, setDisplay] = useState("stockGainLossPercent");
+  const [displaySort, setDisplaySort] = useState("ASC");
 
   useEffect(() => {
     async function getStocks() {
@@ -81,6 +83,38 @@ export default function Home() {
   useEffect(() => {
     setTotals(calcHoldingsTotals(stocks));
   }, [stocks]);
+
+  const sortedStocks = useMemo(() => {
+    switch (displaySort) {
+      case "ASC":
+        return [...stocks].sort((a, b) => {
+          if (a.calculations && b.calculations) {
+            return a.calculations[display] - b.calculations[display];
+          } else {
+            return -2;
+          }
+        });
+      case "DESC":
+        return [...stocks].sort((a, b) => {
+          if (a.calculations && b.calculations) {
+            return b.calculations[display] - a.calculations[display];
+          } else {
+            return -2;
+          }
+        });
+      case "ALPHA":
+        return [...stocks].sort((a, b) => {
+          if (a.ticker < b.ticker) {
+            return -1;
+          } else {
+            return 1;
+          }
+        });
+      default:
+        console.log("Not valid sort");
+        return [...stocks];
+    }
+  }, [stocks, displaySort, display]);
 
   async function handleCreateStock() {
     console.log("Tryign to create stock: ", addStock);
@@ -270,7 +304,9 @@ export default function Home() {
                   <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
                     {/*header*/}
                     <div className="flex flex-row justify-between p-5 border-b border-solid border-blueGray-200 rounded-t">
-                      <h3 className="text-2xl font-semibold">Adjust Settings</h3>
+                      <h3 className="text-2xl font-semibold">
+                        Adjust Settings
+                      </h3>
                       <button
                         className="p-1 ml-auto border-0 text-black opacity-50 float-right text-3xl leading-none font-semibold outline-none focus:outline-none"
                         onClick={() => setShowAdjust(false)}
@@ -278,37 +314,60 @@ export default function Home() {
                         x
                       </button>
                     </div>
-                    {/*body*/}
+                    {/*change display*/}
                     <div className="relative p-6 flex-auto">
-                      <div className="flex flex-row justify-between p-4">
-                        <div className="flex flex-col sm:flex-row gap-4 sm:gap-10 justify-center">
-                          <button
-                            className="border-solid border-4 border-green-400 p-5 rounded-xl filter drop-shadow-sm"
-                            onClick={() =>
-                              handleDisplayChange("stockGainLossPercent")
-                            }
-                          >
-                            Gain/Loss Percent
-                          </button>
-                          <button
-                            className="border-solid border-4 border-green-400 p-5 rounded-xl filter drop-shadow-sm"
-                            onClick={() => handleDisplayChange("stockCAGR")}
-                          >
-                            CAGR
-                          </button>
-                          <button
-                            className="border-solid border-4 border-green-400 p-5 rounded-xl filter drop-shadow-sm"
-                            onClick={() => handleDisplayChange("stockMAGR")}
-                          >
-                            MAGR
-                          </button>
-                          <button
-                            className="border-solid border-4 border-green-400 p-5 rounded-xl filter drop-shadow-sm"
-                            onClick={() => handleDisplayChange("stockWAGR")}
-                          >
-                            WAGR
-                          </button>
-                        </div>
+                      <p className="text-xl text-center">Display Value</p>
+                      <div className="flex flex-col sm:flex-row gap-4 p-4 sm:gap-10 justify-center">
+                        <button
+                          className="bg-green-300 hover:bg-green-500 hover:font-bold hover:text-white px-6 py-3 rounded shadow hover:shadow-lg outline-none"
+                          onClick={() =>
+                            handleDisplayChange("stockGainLossPercent")
+                          }
+                        >
+                          Gain/Loss Percent
+                        </button>
+                        <button
+                          className="bg-green-300 hover:bg-green-500 hover:font-bold hover:text-white px-6 py-3 rounded shadow hover:shadow-lg outline-none"
+                          onClick={() => handleDisplayChange("stockCAGR")}
+                        >
+                          CAGR
+                        </button>
+                        <button
+                          className="bg-green-300 hover:bg-green-500 hover:font-bold hover:text-white px-6 py-3 rounded shadow hover:shadow-lg outline-none"
+                          onClick={() => handleDisplayChange("stockMAGR")}
+                        >
+                          MAGR
+                        </button>
+                        <button
+                          className="bg-green-300 hover:bg-green-500 hover:font-bold hover:text-white px-6 py-3 rounded shadow hover:shadow-lg outline-none"
+                          onClick={() => handleDisplayChange("stockWAGR")}
+                        >
+                          WAGR
+                        </button>
+                      </div>
+                    </div>
+                    {/*change order*/}
+                    <div className="p-4">
+                      <p className="text-xl text-center">Sort Order</p>
+                      <div className="flex flex-row justify-center gap-10 p-5">
+                        <button
+                          className="hover:border-green-300 border px-5 py-2 rounded shadow hover:shadow-lg"
+                          onClick={() => setDisplaySort("ASC")}
+                        >
+                          ASC
+                        </button>
+                        <button
+                          className="hover:border-green-400 border px-5 py-2 rounded shadow hover:shadow-lg"
+                          onClick={() => setDisplaySort("DESC")}
+                        >
+                          DESC
+                        </button>
+                        <button
+                          className="hover:border-green-500 border px-5 py-2 rounded shadow hover:shadow-lg"
+                          onClick={() => setDisplaySort("ALPHA")}
+                        >
+                          ALPHA
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -318,7 +377,7 @@ export default function Home() {
             </>
           )}
           {stocks.length > 0 &&
-            stocks.map((stock) => (
+            sortedStocks.map((stock) => (
               <div key={stock.id} className="px-2">
                 <Link href={`/stock/${encodeURIComponent(stock.id)}`} passHref>
                   <a>
