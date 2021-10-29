@@ -8,6 +8,8 @@ type Stock
   id: ID!
   name: String
   ticker: String!
+  classification: ClassificationType
+  status: StatusType
   overview: Overview
   quote: Quote
   type: StockType
@@ -20,6 +22,19 @@ type Stock
 enum StockType {
   Stock
   Fund
+}
+
+enum ClassificationType {
+  Core
+  Small
+  Big
+}
+
+enum StatusType {
+  Watch
+  Trim
+  Hold
+  Grow
 }
 
 type Holding @model {

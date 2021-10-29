@@ -12,10 +12,13 @@ import {
 import { getStock as GetStock } from "../../src/graphql/queries";
 import {
   updateStockData as UpdateStockData,
+  updateStock as UpdateStock,
   deleteStock as DeleteStock,
   createHolding as CreateHolding,
   deleteHolding as DeleteHolding,
 } from "../../src/graphql/mutations";
+
+import { ClassificationType, StatusType, StockType } from "../../src/models";
 
 import Layout from "../../src/components/layout";
 import PriceRange from "../../src/components/price-range";
@@ -86,6 +89,57 @@ export default function Stock() {
         })
       );
       setStockInfo(stockData.data.updateStockData);
+    } catch ({ errors }) {
+      console.log("Errors: ", errors);
+      throw new Error(errors[0]);
+    }
+  }
+
+  async function handleClassificationUpdate(value) {
+    try {
+      const stockData = await API.graphql(
+        graphqlOperation(UpdateStock, {
+          input: {
+            id: id,
+            classification: value,
+          },
+        })
+      );
+      setStockInfo(stockData.data.updateStock);
+    } catch ({ errors }) {
+      console.log("Errors: ", errors);
+      throw new Error(errors[0]);
+    }
+  }
+  
+  async function handleStatusUpdate(value) {
+    try {
+      const stockData = await API.graphql(
+        graphqlOperation(UpdateStock, {
+          input: {
+            id: id,
+            status: value,
+          },
+        })
+      );
+      setStockInfo(stockData.data.updateStock);
+    } catch ({ errors }) {
+      console.log("Errors: ", errors);
+      throw new Error(errors[0]);
+    }
+  }
+
+  async function handleTypeUpdate(value) {
+    try {
+      const stockData = await API.graphql(
+        graphqlOperation(UpdateStock, {
+          input: {
+            id: id,
+            type: value,
+          },
+        })
+      );
+      setStockInfo(stockData.data.updateStock);
     } catch ({ errors }) {
       console.log("Errors: ", errors);
       throw new Error(errors[0]);
@@ -203,6 +257,51 @@ export default function Stock() {
               </button>
             </div>
           )}
+          <div className="flex flex-row gap-8 justify-center content-center p-2">
+            {Object.entries(ClassificationType).map(([key, value]) => (
+              <button
+                key={key}
+                onClick={() => handleClassificationUpdate(value)}
+                className={
+                  stockInfo.classification === value
+                    ? "py-1 px-4 bg-blue-400 rounded-md shadow-xl text-white"
+                    : "py-1 px-4 border-2 border-solid border-blue-200 rounded-md hover:bg-blue-100 active:bg-blue-500"
+                }
+              >
+                {value}
+              </button>
+            ))}
+          </div>
+          <div className="flex flex-row gap-8 justify-center content-center p-2">
+            {Object.entries(StatusType).map(([key, value]) => (
+              <button
+                key={key}
+                onClick={() => handleStatusUpdate(value)}
+                className={
+                  stockInfo.status === value
+                    ? "py-1 px-4 bg-blue-400 rounded-md shadow-xl text-white"
+                    : "py-1 px-4 border-2 border-solid border-blue-200 rounded-md hover:bg-blue-100 active:bg-blue-500"
+                }
+              >
+                {value}
+              </button>
+            ))}
+          </div>
+          <div className="flex flex-row gap-8 justify-center content-center p-2">
+            {Object.entries(StockType).map(([key, value]) => (
+              <button
+                key={key}
+                onClick={() => handleTypeUpdate(value)}
+                className={
+                  stockInfo.type === value
+                    ? "py-1 px-4 bg-blue-400 rounded-md shadow-xl text-white"
+                    : "py-1 px-4 border-2 border-solid border-blue-200 rounded-md hover:bg-blue-100 active:bg-blue-500"
+                }
+              >
+                {value}
+              </button>
+            ))}
+          </div>
           {!adding && (
             <div className="flex flex-row justify-between">
               <button className="m-4" onClick={() => setAdding(!adding)}>

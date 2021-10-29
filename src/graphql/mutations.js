@@ -7,6 +7,8 @@ export const addStock = /* GraphQL */ `
       id
       name
       ticker
+      classification
+      status
       overview {
         exchange
         currency
@@ -67,6 +69,8 @@ export const updateStockData = /* GraphQL */ `
       id
       name
       ticker
+      classification
+      status
       overview {
         exchange
         currency
@@ -135,6 +139,8 @@ export const createStock = /* GraphQL */ `
       id
       name
       ticker
+      classification
+      status
       overview {
         exchange
         currency
@@ -198,6 +204,8 @@ export const updateStock = /* GraphQL */ `
       id
       name
       ticker
+      classification
+      status
       overview {
         exchange
         currency
@@ -261,6 +269,8 @@ export const deleteStock = /* GraphQL */ `
       id
       name
       ticker
+      classification
+      status
       overview {
         exchange
         currency
@@ -332,6 +342,8 @@ export const createHolding = /* GraphQL */ `
         id
         name
         ticker
+        classification
+        status
         overview {
           exchange
           currency
@@ -395,6 +407,8 @@ export const updateHolding = /* GraphQL */ `
         id
         name
         ticker
+        classification
+        status
         overview {
           exchange
           currency
@@ -458,6 +472,8 @@ export const deleteHolding = /* GraphQL */ `
         id
         name
         ticker
+        classification
+        status
         overview {
           exchange
           currency

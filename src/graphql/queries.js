@@ -17,6 +17,8 @@ export const getStock = /* GraphQL */ `
       id
       name
       ticker
+      classification
+      status
       overview {
         exchange
         currency
@@ -82,6 +84,8 @@ export const listStocks = /* GraphQL */ `
         id
         name
         ticker
+        classification
+        status
         overview {
           exchange
           currency
@@ -141,6 +145,8 @@ export const getHolding = /* GraphQL */ `
         id
         name
         ticker
+        classification
+        status
         overview {
           exchange
           currency
@@ -206,6 +212,8 @@ export const listHoldings = /* GraphQL */ `
           id
           name
           ticker
+          classification
+          status
           type
           createdAt
           updatedAt
@@ -238,6 +246,8 @@ export const stocksByUpdatedAt = /* GraphQL */ `
         id
         name
         ticker
+        classification
+        status
         overview {
           exchange
           currency
